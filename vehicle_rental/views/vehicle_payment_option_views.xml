@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="vehicle_payment_option_form_view" model="ir.ui.view">
+            <field name="name">vehicle.payment.option.form.view</field>
+            <field name="model">vehicle.payment.option</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name"/>
+                            <h1>
+                                <field name="name" placeholder="e.g. 1st Installment"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="payment_date"/>
+                            </group>
+                            <group>
+                                <field name="payment_amount"/>
+                                <field name="company_id" invisible="1"/>
+                                <field name="currency_id" invisible="1"/>
+                                <label for="invoice_id" class="mt-1" invisible="invoice_id == False"/>
+                                <div name="invoice_id">
+                                    <field name="invoice_id" readonly="1" class="oe_inline" force_save="1"
+                                           style="width: auto;" invisible="invoice_id == False"/>
+                                    <field name="payment_state" widget="badge"
+                                           invisible="invoice_id == False"
+                                           decoration-success="payment_state == 'paid'"
+                                           decoration-danger="payment_state == 'not_paid'"
+                                           decoration-info="payment_state == 'in_payment'"
+                                           decoration-primary="payment_state == 'partial'"
+                                           decoration-warning="payment_state == 'reversed'"
+                                           style="margin-left: 10px; width: auto;"/>
+                                </div>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="vehicle_payment_option_tree_view" model="ir.ui.view">
+            <field name="name">vehicle.payment.option.tree.view</field>
+            <field name="model">vehicle.payment.option</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="invoice_item_id"/>
+                    <field name="name"/>
+                    <field name="payment_date"/>
+                    <field name="payment_amount" sum="payment_amount"/>
+                    <field name="company_id" invisible="1"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="invoice_id"
+                           readonly="1" widget="many2one_button"/>
+                    <field name="payment_state" widget="badge"
+                           decoration-success="payment_state == 'paid'"
+                           decoration-danger="payment_state == 'not_paid'"
+                           decoration-info="payment_state == 'in_payment'"
+                           decoration-primary="payment_state == 'partial'"
+                           decoration-warning="payment_state == 'reversed'"/>
+                    <button string="Create Invoice" name="action_create_payment_invoice"
+                            type="object" class="oe_highlight" invisible="invoice_id != False"/>
+                </tree>
+            </field>
+        </record>
+        <record id="action_vehicle_payment_option" model="ir.actions.act_window">
+            <field name="name">Vehicle Payment Option</field>
+            <field name="res_model">vehicle.payment.option</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

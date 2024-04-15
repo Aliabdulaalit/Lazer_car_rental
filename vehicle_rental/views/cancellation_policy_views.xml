@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <!--Cancellation Policy-->
+        <record id="cancellation_policy_form_view" model="ir.ui.view">
+            <field name="name">cancellation.policy.form.view</field>
+            <field name="model">cancellation.policy</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="title" placeholder="e.g.Policy Name.."/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                            </group>
+                            <group>
+                                <field name="created_on"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page name="terms_and_condition" string="Terms &amp; Conditions">
+                                <field name="terms_and_conditions"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="cancellation_policy_tree_view" model="ir.ui.view">
+            <field name="name">cancellation.policy.tree.view</field>
+            <field name="model">cancellation.policy</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="title"/>
+                    <field name="created_on"/>
+                </tree>
+            </field>
+        </record>
+        <record id="cancellation_policy_search_view" model="ir.ui.view">
+            <field name="name">cancellation.policy.search.view</field>
+            <field name="model">cancellation.policy</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="title"/>
+                    <group string="Group By">
+                        <filter name="title" string="Title"
+                                context="{'group_by': 'title'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="action_cancellation_policy" model="ir.actions.act_window">
+            <field name="name">Cancellation Policy</field>
+            <field name="res_model">cancellation.policy</field>
+            <field name="view_mode">tree,form,search</field>
+        </record>
+    </data>
+</odoo>

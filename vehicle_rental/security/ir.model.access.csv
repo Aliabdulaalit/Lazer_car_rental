@@ -1,0 +1,11 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+vehicle_rental.access_vehicle_contract,access_vehicle_contract,vehicle_rental.model_vehicle_contract,base.group_user,1,1,1,1
+vehicle_rental.access_customer_documents,access_customer_documents,vehicle_rental.model_customer_documents,base.group_user,1,1,1,1
+vehicle_rental.access_cancellation_policy,access_cancellation_policy,vehicle_rental.model_cancellation_policy,base.group_user,1,1,1,1
+vehicle_rental.access_vehicle_rental_dashboard,access_vehicle_rental_dashboard,vehicle_rental.model_vehicle_rental_dashboard,base.group_user,1,1,1,1
+vehicle_rental.access_rental_vehicle_image,access_rental_vehicle_image,vehicle_rental.model_rental_vehicle_image,base.group_user,1,1,1,1
+vehicle_rental.access_insurance_policy,access_insurance_policy,vehicle_rental.model_insurance_policy,base.group_user,1,1,1,1
+vehicle_rental.access_extra_service,access_extra_service,vehicle_rental.model_extra_service,base.group_user,1,1,1,1
+vehicle_rental.access_vehicle_damage_image,access_vehicle_damage_image,vehicle_rental.model_vehicle_damage_image,base.group_user,1,1,1,1
+vehicle_rental.access_vehicle_damage,access_vehicle_damage,vehicle_rental.model_vehicle_damage,base.group_user,1,1,1,1
+vehicle_rental.access_vehicle_payment_option,access_vehicle_payment_option,vehicle_rental.model_vehicle_payment_option,base.group_user,1,1,1,1

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record id="extra_service_form_view" model="ir.ui.view">
+            <field name="name">extra.service.form.view</field>
+            <field name="model">extra.service</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="product_id"/>
+                                <field name="description"/>
+                            </group>
+                            <group>
+                                <field name="product_qty"/>
+                                <field name="amount"/>
+                                <field name="total_service_charge"/>
+                                <field name="company_id" invisible="1"/>
+                                <field name="currency_id" invisible="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="extra_service_tree_view" model="ir.ui.view">
+            <field name="name">extra.service.tree.view</field>
+            <field name="model">extra.service</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="product_id"/>
+                    <field name="product_qty"/>
+                    <field name="description"/>
+                    <field name="amount"/>
+                    <field name="total_service_charge"/>
+                    <field name="currency_id" column_invisible="True"/>
+                    <field name="company_id" column_invisible="True"/>
+                </tree>
+            </field>
+        </record>
+        <record id="extra_service_search_view" model="ir.ui.view">
+            <field name="name">extra.service.search.view</field>
+            <field name="model">extra.service</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="product_id"/>
+                    <group string="Group By">
+                        <filter name="product_id" string="Product"
+                                context="{'group_by': 'product_id' }"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="action_extra_service" model="ir.actions.act_window">
+            <field name="name">Extra Service</field>
+            <field name="res_model">extra.service</field>
+            <field name="view_mode">form,tree,search</field>
+        </record>
+    </data>
+</odoo>

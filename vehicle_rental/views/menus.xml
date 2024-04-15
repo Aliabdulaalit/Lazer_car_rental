@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <menuitem id="main_menu_vehicle_rental" name="Vehicle Rental"
+                  web_icon="vehicle_rental,static/description/icon.png"/>
+
+        <menuitem id="menu_vehicle_dashboard"
+                  name="Dashboard"
+                  sequence="0"
+                  action="action_vehicle_rental_dashboard"
+                  parent="main_menu_vehicle_rental"/>
+
+        <menuitem id="menu_fleet_vehicle"
+                  name="Vehicles"
+                  parent="main_menu_vehicle_rental"
+                  action="action_fleet_vehicle"
+                  sequence="1"/>
+        <menuitem id="menu_vehicle_contract"
+                  name="Contracts"
+                  parent="main_menu_vehicle_rental"
+                  action="action_vehicle_contract"
+                  sequence="2"/>
+        <menuitem id="menu_fleet_vehicle_customer"
+                  name="Customers"
+                  parent="main_menu_vehicle_rental"
+                  action="contacts.action_contacts"
+                  sequence="3"/>
+
+        <menuitem id="menu_configuration" name="Configurations" parent="main_menu_vehicle_rental" sequence="20"/>
+        <menuitem id="menu_cancellation_policy"
+                  name="Cancellation Policy"
+                  parent="menu_configuration"
+                  action="action_cancellation_policy"
+                  sequence="1"/>
+    </data>
+</odoo>

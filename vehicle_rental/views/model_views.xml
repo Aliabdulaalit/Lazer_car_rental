@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <!--Customer Invoice-->
+        <record id="account_move_form_view" model="ir.ui.view">
+            <field name="name">account.move.form.view</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='payment_reference']" position="after">
+                    <field name="vehicle_contract_id" readonly="1" force_save="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!--Customer Deposit-->
+        <record id="customer_deposit_payment_form_view" model="ir.ui.view">
+            <field name="name">customer.deposit.payment.form.view</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='journal_id']" position="before">
+                    <field name="vehicle_contract_id" readonly="1" force_save="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!--Fleet Vehicle-->
+        <record id="vehicle_rental_form_view" model="ir.ui.view">
+            <field name="name">vehicle.rental.form.view</field>
+            <field name="model">fleet.vehicle</field>
+            <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='state_id']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+                <xpath expr="//form//sheet" position="before">
+                    <header>
+                        <field name="status" widget="statusbar"/>
+                        <button string="Under Maintenance" name="available_to_in_maintenance" type="object"
+                                invisible="status == 'in_maintenance'"/>
+                        <button string="Available" name="in_maintenance_to_available" type="object"
+                                invisible="status == 'available'"/>
+                    </header>
+                </xpath>
+                <xpath expr="//field[@name='image_128']" position='before'>
+                    <widget name="web_ribbon" title="Available" bg_color="bg-success"
+                            invisible="status == 'in_maintenance'"/>
+                    <widget name="web_ribbon" title="In Maintenance" bg_color="bg-danger"
+                            invisible="status == 'available'"/>
+                </xpath>
+                <xpath expr="//form/sheet/group" position="inside">
+                    <group string="Rent Details">
+                        <field name="rent_day"/>
+                        <field name="rent_week"/>
+                        <field name="rent_month"/>
+                        <field name="rent_km"/>
+                        <field name="rent_mi"/>
+
+                        <field name="rent_hour"/>
+                        <field name="rent_year"/>
+                    </group>
+                    <group string="Extra Charge Details">
+                        <field name="extra_charge_day"/>
+                        <field name="extra_charge_week"/>
+                        <field name="extra_charge_month"/>
+                        <field name="extra_charge_km"/>
+                        <field name="extra_charge_mi"/>
+
+                        <field name="extra_charge_hour"/>
+                        <field name="extra_charge_year"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <record id='vehicle_rental_tree_view' model='ir.ui.view'>
+            <field name="name">vehicle.rental.tree.view</field>
+            <field name="model">fleet.vehicle</field>
+            <field name="inherit_id" ref="fleet.fleet_vehicle_view_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='tag_ids']" position="after">
+                    <field name="status" widget="badge"
+                           decoration-success="status == 'available'"
+                           decoration-danger="status == 'in_maintenance'"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id='vehicle_rental_kanban_view' model='ir.ui.view'>
+            <field name="name">vehicle.rental.kanban.view</field>
+            <field name="model">fleet.vehicle</field>
+            <field name="inherit_id" ref="fleet.fleet_vehicle_view_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('o_kanban_record_bottom')]" position="after">
+                    <div class="oe_kanban_bottom_right">
+                        <field name="status" widget="badge"
+                               decoration-success="status == 'available'"
+                               decoration-danger="status == 'in_maintenance'"/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+        <record id="action_fleet_vehicle" model="ir.actions.act_window">
+            <field name="name">Vehicle</field>
+            <field name="res_model">fleet.vehicle</field>
+            <field name="view_mode">kanban,tree,form,pivot,activity</field>
+        </record>
+
+        <!--Fleet Vehicle Log Contract-->
+        <record id="fleet_vehicle_log_contract_form_view_inherit" model="ir.ui.view">
+            <field name="name">fleet.vehicle.log.contract.form.view.inherit</field>
+            <field name="model">fleet.vehicle.log.contract</field>
+            <field name="inherit_id" ref="fleet.fleet_vehicle_log_contract_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='vehicle_id']" position="after">
+                    <field name="license_plate"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
