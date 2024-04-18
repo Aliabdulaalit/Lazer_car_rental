@@ -1,0 +1,32 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="tuple.job_order" />
+          <option value="tuple.x_vehicle_no" />
+          <option value="tuple.x_driver_id" />
+          <option value="tuple.x_delivery_datetime" />
+          <option value="tuple.x_labour" />
+          <option value="tuple.x_changed" />
+          <option value="tuple.x_container_no" />
+          <option value="tuple.x_loading_datetime" />
+          <option value="tuple.container_size" />
+          <option value="tuple.x_validity_date" />
+          <option value="tuple.x_special_equipments" />
+          <option value="list.mapped" />
+          <option value="tuple.mapped" />
+          <option value="str.__sub__" />
+          <option value="tuple.x_days_to_hours" />
+          <option value="tuple.x_arrival_datetime" />
+          <option value="float.days" />
+          <option value="tuple.port_id" />
+          <option value="dict.action" />
+          <option value="dict._context" />
+          <option value="tuple.note" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

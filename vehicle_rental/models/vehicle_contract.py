@@ -247,12 +247,6 @@ class VehicleContract(models.Model):
         res = super(VehicleContract, self).create(vals_list)
         return res
 
-    @api.constrains('start_date')
-    def _check_start_date(self):
-        today = fields.Datetime.now()
-        for record in self:
-            if record.start_date and record.start_date < today:
-                raise ValidationError(_("Ensure start date is greater than or equal to today's date."))
 
     @api.onchange('start_date', 'end_date')
     def get_vehicle_select(self):

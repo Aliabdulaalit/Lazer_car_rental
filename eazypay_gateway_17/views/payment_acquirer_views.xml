@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="merchant_easypay_provider" model="ir.ui.view">
+            <field name="name">merchant.easypay.provider</field>
+            <field name="model">payment.provider</field>
+            <field name="inherit_id" ref="payment.payment_provider_form"/>
+            <field name="arch" type="xml">
+                <group name="provider_credentials" position='inside'>
+                    <group invisible="code != 'eazypay'">
+                        <field name="eazypay_merchant_id"/>
+                        <field name="eazypay_merchant_name"/>
+                        <field name="eazypay_password"/>
+                    </group>
+                </group>
+            </field>
+        </record>
+    </data>
+</odoo>
