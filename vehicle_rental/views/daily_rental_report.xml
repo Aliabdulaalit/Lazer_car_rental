@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+
+        <record id="daily_rental_report" model="ir.ui.view">
+            <field name="name">daily.rental.report.tree.view</field>
+            <field name="model">vehicle.contract</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="reference_no"/>
+                    <field name="vehicle_id"/>
+                    <field name="customer_id"/>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                    <field name="compute_start_date" invisible="0"/>
+                    <field name="total_vehicle_rent"/>
+                    <field name="currency_id" column_invisible="True"/>
+                    <field name="company_id" column_invisible="True"/>
+                    <field name="status" widget="badge" decoration-info="status == 'a_draft'"
+                           decoration-warning="status == 'b_in_progress'" decoration-success="status == 'c_return'"
+                           decoration-danger="status == 'd_cancel'"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_daily_rental_report" model="ir.actions.act_window">
+            <field name="name">Daily Rental Report</field>
+            <field name="res_model">vehicle.contract</field>
+            <field name="view_id" ref="vehicle_rental.daily_rental_report"/>
+            <field name="view_mode">tree</field>
+            <field name="context">{'create':false}</field>
+            <!--            <field name="domain">[(current_date,'=', compute_start_date)]</field>-->
+<!--            <field name="domain">[('is_equal_date', '=', True)]</field>-->
+        </record>
+
+    </data>
+
+</odoo>

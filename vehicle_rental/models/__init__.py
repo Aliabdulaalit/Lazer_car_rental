@@ -9,3 +9,6 @@ from . import cancellation_policy
 from . import insurance_policy
 from . import extra_service
 from . import vehicle_payment_option
+from . import res_config_settings
+from . import res_company
+from . import res_partner

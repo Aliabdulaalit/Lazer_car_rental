@@ -42,6 +42,7 @@ class VehicleContract(models.Model):
     license_plate = fields.Char(string="License Plate")
 
     is_driver_required = fields.Boolean(string="Driver Required")
+    is_equal_date = fields.Boolean(string="Is Equal Date", compute='compute_is_equal_date', store=1)
     driver_id = fields.Many2one('res.partner', string="Driver")
     driver_charge_type = fields.Selection([('including', "Including in rent charge"),
                                            ('excluding', "Excluding in rent charge")], string="Charge Type",
@@ -67,8 +68,20 @@ class VehicleContract(models.Model):
                                     copy=False)
 
     customer_id = fields.Many2one("res.partner", required=True)
-    customer_phone = fields.Char(string="Phone")
-    customer_email = fields.Char(string="Email")
+    customer_phone = fields.Char(string="Phone", related="customer_id.phone")
+    customer_email = fields.Char(string="Email", related="customer_id.email")
+    work_name = fields.Char(string="Work Name", related="customer_id.work_name")
+    residence_address = fields.Char(string="Residence Address", related="customer_id.residence_address")
+    driving_license_no = fields.Char(string="Driving License No.", related="customer_id.driving_license_no")
+    issued_place = fields.Many2one("res.country", string="Issued Place", related="customer_id.issued_place")
+    nationality = fields.Many2one("res.country", string="Nationality", related="customer_id.nationality")
+    expiry_date = fields.Date(string="Expiry Date", related="customer_id.expiry_date")
+    related_blacklist = fields.Boolean(string="Blacklist", related="customer_id.blacklist", store=1)
+    related_cpr = fields.Char(string="CPR", related="customer_id.cpr")
+    related_card_number = fields.Char(string="Card Number", related="customer_id.card_number")
+    related_card_holder_name = fields.Char(string="Card Holder Name", related="customer_id.card_holder_name")
+    related_card_expiration_date = fields.Date(string="Card Expiration Date",
+                                               related="customer_id.card_expiration_date")
     customer_document_id = fields.Many2one("customer.documents", string="Document")
     document_count = fields.Integer(compute='_compute_document_count')
 
@@ -90,10 +103,13 @@ class VehicleContract(models.Model):
 
     total_extra_km = fields.Float(string="Total Extra K/M", default=1)
     total_extra_mi = fields.Float(string="Total Extra Miles", default=1)
+    fuel_charges = fields.Float(string="Fuel Charges", default=0)
     extra_charge = fields.Monetary(string="Extra Charge")
     total_extra_charges = fields.Monetary(string="Total Extra Charges", compute='_get_total_extra_charges')
+    total_fuel_charges = fields.Monetary(string="Total Fuel Charges", compute='_get_total_extra_charges')
 
     start_date = fields.Datetime(string="Pick-up Date", copy=False)
+    compute_start_date = fields.Date(string="Compute Start Date", copy=False, compute='compute_date')
     pick_up_street = fields.Char(translate=True)
     pick_up_street2 = fields.Char(translate=True)
     pick_up_city = fields.Char(translate=True)
@@ -163,6 +179,32 @@ class VehicleContract(models.Model):
     total_day_rent = fields.Monetary(compute="_total_day_rent")
     total_km_rent = fields.Monetary(compute="_total_km_rent")
     total_mi_rent = fields.Monetary(compute="_total_mi_rent")
+
+    @api.depends('start_date')
+    def compute_date(self):
+        for rec in self:
+            if rec.start_date:
+                rec.compute_start_date = rec.start_date.date()
+            else:
+                rec.compute_start_date = False
+
+    @api.depends('start_date')
+    def compute_is_equal_date(self):
+        for rec in self:
+            if rec.start_date:
+                if rec.start_date.date() == fields.date.today():
+                    rec.is_equal_date = True
+
+                else:
+                    rec.is_equal_date = False
+
+    def action_block_customer(self):
+        for rec in self:
+            rec.customer_id.blacklist = True
+
+    def action_unblock_customer(self):
+        for rec in self:
+            rec.customer_id.blacklist = False
 
     def a_draft_to_b_in_progress(self):
         for rec in self:
@@ -247,7 +289,6 @@ class VehicleContract(models.Model):
         res = super(VehicleContract, self).create(vals_list)
         return res
 
-
     @api.onchange('start_date', 'end_date')
     def get_vehicle_select(self):
         for rec in self:
@@ -276,12 +317,17 @@ class VehicleContract(models.Model):
                     'odometer_unit': self.odometer_unit,
                 })
 
-    @api.onchange('customer_id')
-    def get_customer_details(self):
-        for rec in self:
-            if rec.customer_id:
-                rec.customer_phone = rec.customer_id.phone
-                rec.customer_email = rec.customer_id.email
+    # @api.onchange('customer_id')
+    # def get_customer_details(self):
+    #     for rec in self:
+    #         if rec.customer_id:
+    #             rec.customer_phone = rec.customer_id.phone
+    #             rec.customer_email = rec.customer_id.email
+    #             rec.work_name = rec.customer_id.work_name
+    #             rec.residence_address = rec.customer_id.residence_address
+    #             rec.driving_license_no = rec.customer_id.driving_license_no
+    #             rec.issued_place = rec.customer_id.issued_place
+    #             rec.expiry_date = rec.customer_id.expiry_date
 
     @api.onchange('vehicle_id')
     def get_vehicle_details(self):
@@ -418,65 +464,128 @@ class VehicleContract(models.Model):
                 elif rec.rent_type == 'mi':
                     total_extra_charges = rec.extra_charge * rec.total_extra_mi
             rec.total_extra_charges = total_extra_charges
+            if rec.fuel_charges:
+                rec.total_fuel_charges = rec.fuel_charges
+            else:
+                rec.total_fuel_charges = 0
 
     def action_create_extra_charge_invoice(self):
         invoice_lines = []
+        print(invoice_lines, "invvvvvv")
         if self.rent_type == 'days':
-            extra_days = {
-                'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
-                'name': self.vehicle_id.name,
-                'quantity': self.total_extra_days,
-                'price_unit': self.extra_charge,
-            }
-            invoice_lines = [(0, 0, extra_days)]
+            invoice_lines.append((0, 0, {'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
+                                         'name': self.vehicle_id.name,
+                                         'analytic_distribution': {self.vehicle_id.analytic_tag_ids.id: 100},
+                                         'quantity': self.total_extra_days,
+                                         'price_unit': self.extra_charge,
+                                         }))
+        # if self.rent_type == 'days':
+        #     extra_days = {
+        #         'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
+        #         'name': self.vehicle_id.name,
+        #         'quantity': self.total_extra_days,
+        #         'price_unit': self.extra_charge,
+        #     }
+        #     print("00000000")
+        #     invoice_lines = [(0, 0, extra_days)]
         if self.rent_type == 'week':
-            extra_weeks = {
-                'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
-                'name': self.vehicle_id.name,
-                'quantity': self.total_extra_week,
-                'price_unit': self.extra_charge,
-            }
-            invoice_lines = [(0, 0, extra_weeks)]
+            invoice_lines.append((0, 0, {'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
+                                         'name': self.vehicle_id.name,
+                                         'analytic_distribution': {self.vehicle_id.analytic_tag_ids.id: 100},
+                                         'quantity': self.total_extra_week,
+                                         'price_unit': self.extra_charge,
+                                         }))
+            # extra_weeks = {
+            #     'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
+            #     'name': self.vehicle_id.name,
+            #     'quantity': self.total_extra_week,
+            #     'price_unit': self.extra_charge,
+            # }
+            # invoice_lines = [(0, 0, extra_weeks)]
         if self.rent_type == 'month':
-            extra_months = {
-                'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
-                'name': self.vehicle_id.name,
-                'quantity': self.total_extra_month,
-                'price_unit': self.extra_charge,
-            }
-            invoice_lines = [(0, 0, extra_months)]
+            invoice_lines.append((0, 0, {'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
+                                         'analytic_distribution': {self.vehicle_id.analytic_tag_ids.id: 100},
+                                         'name': self.vehicle_id.name,
+                                         'quantity': self.total_extra_month,
+                                         'price_unit': self.extra_charge,
+                                         }))
+            # extra_months = {
+            #     'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
+            #     'name': self.vehicle_id.name,
+            #     'quantity': self.total_extra_month,
+            #     'price_unit': self.extra_charge,
+            # }
+            # invoice_lines = [(0, 0, extra_months)]
         if self.rent_type == 'hour':
-            extra_hours = {
-                'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
-                'name': self.vehicle_id.name,
-                'quantity': self.total_extra_hour,
-                'price_unit': self.extra_charge,
-            }
-            invoice_lines = [(0, 0, extra_hours)]
+            invoice_lines.append((0, 0, {'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
+                                         'name': self.vehicle_id.name,
+                                         'quantity': self.total_extra_hour,
+                                         'price_unit': self.extra_charge,
+                                         }))
+            # extra_hours = {
+            #     'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
+            #     'name': self.vehicle_id.name,
+            #     'quantity': self.total_extra_hour,
+            #     'price_unit': self.extra_charge,
+            # }
+            # invoice_lines = [(0, 0, extra_hours)]
         if self.rent_type == 'year':
-            extra_years = {
-                'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
-                'name': self.vehicle_id.name,
-                'quantity': self.total_extra_year,
-                'price_unit': self.extra_charge,
-            }
-            invoice_lines = [(0, 0, extra_years)]
+            invoice_lines.append((0, 0, {'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
+                                         'name': self.vehicle_id.name,
+                                         'analytic_distribution': {self.vehicle_id.analytic_tag_ids.id: 100},
+                                         'quantity': self.total_extra_year,
+                                         'price_unit': self.extra_charge,
+                                         }))
+            # extra_years = {
+            #     'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
+            #     'name': self.vehicle_id.name,
+            #     'quantity': self.total_extra_year,
+            #     'price_unit': self.extra_charge,
+            # }
+            # invoice_lines = [(0, 0, extra_years)]
         if self.rent_type == 'km':
-            extra_kms = {
-                'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
-                'name': self.vehicle_id.name,
-                'quantity': self.total_extra_km,
-                'price_unit': self.extra_charge,
-            }
-            invoice_lines = [(0, 0, extra_kms)]
+            invoice_lines.append((0, 0, {'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
+                                         'name': self.vehicle_id.name,
+                                         'analytic_distribution': {self.vehicle_id.analytic_tag_ids.id: 100},
+                                         'quantity': self.total_extra_km,
+                                         'price_unit': self.extra_charge,
+                                         }))
+            # extra_kms = {
+            #     'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
+            #     'name': self.vehicle_id.name,
+            #     'quantity': self.total_extra_km,
+            #     'price_unit': self.extra_charge,
+            # }
+            # invoice_lines = [(0, 0, extra_kms)]
         if self.rent_type == 'mi':
-            extra_mis = {
-                'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
-                'name': self.vehicle_id.name,
-                'quantity': self.total_extra_mi,
-                'price_unit': self.extra_charge,
-            }
-            invoice_lines = [(0, 0, extra_mis)]
+            invoice_lines.append((0, 0, {'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
+                                         'name': self.vehicle_id.name,
+                                         'analytic_distribution': {self.vehicle_id.analytic_tag_ids.id: 100},
+                                         'quantity': self.total_extra_mi,
+                                         'price_unit': self.extra_charge,
+                                         }))
+            # extra_mis = {
+            #     'product_id': self.env.ref('vehicle_rental.vehicle_rent_extra_charge').id,
+            #     'name': self.vehicle_id.name,
+            #     'quantity': self.total_extra_mi,
+            #     'price_unit': self.extra_charge,
+            # }
+            # invoice_lines = [(0, 0, extra_mis)]
+        if self.total_fuel_charges:
+            invoice_lines.append((0, 0, {'product_id': self.env.ref('vehicle_rental.vehicle_rent_fuel_extra_charge').id,
+                                         'name': self.vehicle_id.name,
+                                         'analytic_distribution': {self.vehicle_id.analytic_tag_ids.id: 100},
+                                         'quantity': 1,
+                                         'price_unit': self.total_fuel_charges,
+                                         }))
+            # fuel_extra_charges = {
+            #     'product_id': self.env.ref('vehicle_rental.vehicle_rent_fuel_extra_charge').id,
+            #     'name': self.vehicle_id.name,
+            #     'quantity': 1,
+            #     'price_unit': self.total_fuel_charges,
+            # }
+            # invoice_lines = [(0, 0, fuel_extra_charges)]
+            print("111111")
         data = {
             'partner_id': self.customer_id.id,
             'move_type': 'out_invoice',

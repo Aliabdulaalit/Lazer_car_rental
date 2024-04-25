@@ -31,6 +31,19 @@
             <field name="model">fleet.vehicle</field>
             <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page name="insurance_registration" string="Insurance/Registration">
+                        <group>
+                            <group>
+                                <field name="user_id"/>
+                            </group>
+                            <group>
+                                <field name="insurance_expiration_date"/>
+                                <field name="registration_expiration_date"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
                 <xpath expr="//field[@name='state_id']" position="attributes">
                     <attribute name="invisible">True</attribute>
                 </xpath>
@@ -69,6 +82,7 @@
 
                         <field name="extra_charge_hour"/>
                         <field name="extra_charge_year"/>
+                        <field name="analytic_tag_ids" widget="many2many_tags" readonly="1" force_save="1"/>
                     </group>
                 </xpath>
             </field>

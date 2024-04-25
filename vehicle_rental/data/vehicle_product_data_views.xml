@@ -42,5 +42,10 @@
             <field name="detailed_type">service</field>
             <field name="categ_id" ref="vehicle_rental.product_category_vehicle"/>
         </record>
+        <record id="vehicle_rent_fuel_extra_charge" model="product.product">
+            <field name="name">Fuel Extra Charge</field>
+            <field name="detailed_type">service</field>
+            <field name="categ_id" ref="vehicle_rental.product_category_vehicle"/>
+        </record>
     </data>
 </odoo>

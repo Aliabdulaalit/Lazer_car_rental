@@ -8,6 +8,7 @@
     'summary': "Vehicle Rental Management",
     'author': 'TechKhedut Inc.',
     'website': "https://techkhedut.com",
+    'module_type': 'official',
     'depends': ['mail', 'contacts', 'product', 'fleet', 'sale_management'],
     'data': [
         # data
@@ -16,6 +17,7 @@
         'data/vehicle_rental_mail_template.xml',
         'data/report_paper_format.xml',
         'data/ir_cron.xml',
+        'data/analytic_plan.xml',
         # Security
         'security/ir.model.access.csv',
         # Wizards
@@ -31,6 +33,10 @@
         'views/extra_service_views.xml',
         'views/vehicle_damage_image_views.xml',
         'views/vehicle_payment_option_views.xml',
+        'views/customer_blacklist.xml',
+        'views/daily_rental_report.xml',
+        'views/res_partner_view.xml',
+        'views/res_config_settings_views.xml',
         # Reports
         'report/vehicle_contract_report_views.xml',
         'report/scratch_report_views.xml',
@@ -52,5 +58,4 @@
     'application': True,
     'auto_install': False,
     'price': 110,
-    'currency': 'EUR',
 }

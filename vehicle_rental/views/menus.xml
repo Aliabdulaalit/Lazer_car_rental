@@ -25,7 +25,16 @@
                   parent="main_menu_vehicle_rental"
                   action="contacts.action_contacts"
                   sequence="3"/>
-
+        <menuitem id="menu_reporting" name="Reporting" parent="main_menu_vehicle_rental" sequence="18">
+            <menuitem id="menu_fleet_vehicle_customer_blacklist"
+                      name="Customer Blacklist"
+                      action="action_blacklist_customer"
+                      sequence="1"/>
+            <menuitem id="menu_fleet_daily_report"
+                      name="Daily Rental Report"
+                      action="action_daily_rental_report"
+                      sequence="5"/>
+        </menuitem>
         <menuitem id="menu_configuration" name="Configurations" parent="main_menu_vehicle_rental" sequence="20"/>
         <menuitem id="menu_cancellation_policy"
                   name="Cancellation Policy"

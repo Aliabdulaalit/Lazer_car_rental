@@ -35,6 +35,12 @@
                         <button string="Cancellation Charge" name="cancellation_charge_invoice" class="oe_highlight"
                                 type="object"
                                 invisible="status not in ['d_cancel'] or cancellation_invoice_id != False"/>
+                        <button string="Block Customer" name="action_block_customer" class="oe_highlight"
+                                type="object" invisible="related_blacklist == True"
+                        />
+                        <button string="Unblock Customer" name="action_unblock_customer" class="oe_highlight"
+                                type="object"
+                                invisible="related_blacklist == False"/>
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box" position="inside">
@@ -57,10 +63,21 @@
                         <group string="Customer Details">
                             <group>
                                 <field name="customer_id" readonly="status != 'a_draft'"/>
+                                <field name="nationality" readonly="1"/>
+                                <field name="work_name" readonly="1"/>
+                                <field name="driving_license_no" readonly="1"/>
+                                <field name="expiry_date" readonly="1"/>
+                                <field name="related_blacklist" readonly="1"/>
+                                <field name="related_card_holder_name" readonly="1"/>
                             </group>
                             <group>
-                                <field name="customer_phone" readonly="status != 'a_draft'"/>
-                                <field name="customer_email" readonly="status != 'a_draft'"/>
+                                <field name="customer_phone" readonly="1"/>
+                                <field name="customer_email" readonly="1"/>
+                                <field name="residence_address" readonly="1"/>
+                                <field name="issued_place" readonly="1"/>
+                                <field name="related_cpr" readonly="1"/>
+                                <field name="related_card_number" readonly="1"/>
+                                <field name="related_card_expiration_date" readonly="1"/>
                             </group>
                         </group>
                         <group string="Pick-Up &amp; Drop-Off Details">
@@ -114,6 +131,8 @@
                                 <field name="vehicle_id"
                                        readonly="start_date == False or end_date == False or status != 'a_draft'"
                                        required="start_date != False or end_date != False"/>
+                                <field name="compute_start_date" invisible="0"/>
+                                <field name="is_equal_date" invisible="0"/>
                                 <field name="license_plate" invisible="1"/>
                                 <field name="vehicle_ids" invisible="1"/>
                                 <field name="model_year" readonly="1" force_save="1"/>
@@ -254,11 +273,20 @@
                                 <field name="extra_charge" string="Extra Charge / MI"
                                        invisible="is_any_extra_charges == False or rent_type != 'mi'"
                                        readonly="extra_charge_invoice_id != False"/>
+                                <field name="fuel_charges"
+                                       invisible="is_any_extra_charges == False"
+                                       readonly="extra_charge_invoice_id != False"/>
 
                                 <label for="total_extra_charges" class="mt-1" string="Total Extra Charges"
                                        invisible="is_any_extra_charges == False"/>
                                 <div name="total_extra_charges">
                                     <field name="total_extra_charges" class="oe_inline"
+                                           invisible="is_any_extra_charges == False"/>
+                                </div>
+                                <label for="total_fuel_charges" class="mt-1" string="Total Fuel Extra Charges"
+                                       invisible="is_any_extra_charges == False"/>
+                                <div name="total_fuel_charges">
+                                    <field name="total_fuel_charges" class="oe_inline"
                                            invisible="is_any_extra_charges == False"/>
                                 </div>
                             </group>

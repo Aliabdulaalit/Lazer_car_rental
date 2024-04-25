@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2019-2022 Sodexis
+     License OPL-1 (See LICENSE file for full copyright and licensing details). -->
+<odoo>
+    <record model="ir.ui.view" id="view_partner_form">
+        <field name="name">res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="nationality"/>
+                <field name="work_name"/>
+                <field name="cpr"/>
+                <field name="residence_address"/>
+                <field name="driving_license_no"/>
+                <field name="issued_place"/>
+                <field name="expiry_date"/>
+                <field name="blacklist" readonly="1"/>
+            </xpath>
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="card_number"/>
+                <field name="card_holder_name"/>
+                <field name="card_expiration_date"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

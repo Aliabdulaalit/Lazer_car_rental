@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record id="res_partner_customer_blacklist_tree_view" model="ir.ui.view">
+            <field name="name">res.partner.customer.blacklist.tree.view</field>
+            <field name="model">res.partner</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" readonly="1"/>
+                    <field name="cpr" readonly="1"/>
+                    <field name="nationality" readonly="1"/>
+                    <field name="blacklist" readonly="1"/>
+                    <button string="Unblock Customer" name="action_unblock_customer" class="oe_highlight"
+                            type="object"
+                            invisible="'blacklist' == False"/>
+                </tree>
+
+            </field>
+        </record>
+
+        <record id="action_blacklist_customer" model="ir.actions.act_window">
+            <field name="name">Blacklist Customers</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_id" ref="res_partner_customer_blacklist_tree_view"/>
+            <field name="context">{'create':false}</field>
+            <field name="view_mode">tree</field>
+            <field name="domain">[('blacklist', '=', True)]
+            </field>
+        </record>
+
+    </data>
+
+</odoo>
