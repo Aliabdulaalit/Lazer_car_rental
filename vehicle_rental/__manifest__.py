@@ -35,6 +35,7 @@
         'views/vehicle_payment_option_views.xml',
         'views/customer_blacklist.xml',
         'views/daily_rental_report.xml',
+        'views/daily_payment_report.xml',
         'views/res_partner_view.xml',
         'views/res_config_settings_views.xml',
         # Reports

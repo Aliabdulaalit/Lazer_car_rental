@@ -23,6 +23,39 @@
             </field>
         </record>
 
+        <!--         <record id="action_view_search" model="ir.ui.view">-->
+        <!--            <field name="name">ir.actions.actions.search</field>-->
+        <!--            <field name="model">ir.actions.actions</field>-->
+        <!--            <field name="arch" type="xml">-->
+        <!--                <search string="Action">-->
+        <!--                    <field name="name" filter_domain="['|', ('name','ilike',self), ('type','ilike',self)]" string="Action"/>-->
+        <!--                    <group>-->
+        <!--                        <filter string="Action Type" name="type" context="{'group_by':'type'}"/>-->
+        <!--                        <filter string="Binding Type" name="binding_type" context="{'group_by':'binding_type'}"/>-->
+        <!--                        <filter string="Binding Model" name="binding_model_id" context="{'group_by':'binding_model_id'}"/>-->
+        <!--                    </group>-->
+        <!--                </search>-->
+        <!--            </field>-->
+        <!--        </record>-->
+
+        <record id="daily_rental_report_search" model="ir.ui.view">
+            <field name="name">daily.rental.report.search.view</field>
+            <field name="model">vehicle.contract</field>
+            <field name="arch" type="xml">
+                <search>
+                    <group>
+                        <filter name="today" string="Today"
+                                domain="[('start_date', '&gt;', (context_today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d'))]"/>
+
+<!--                        <filter name="planned_today" string="Today"-->
+<!--                                domain="[('x_batch_date', '=', context_today().strftime('%Y-%m-%d'))]"/>-->
+
+
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <record id="action_daily_rental_report" model="ir.actions.act_window">
             <field name="name">Daily Rental Report</field>
             <field name="res_model">vehicle.contract</field>
@@ -30,7 +63,7 @@
             <field name="view_mode">tree</field>
             <field name="context">{'create':false}</field>
             <!--            <field name="domain">[(current_date,'=', compute_start_date)]</field>-->
-<!--            <field name="domain">[('is_equal_date', '=', True)]</field>-->
+            <!--            <field name="domain">[('is_equal_date', '=', True)]</field>-->
         </record>
 
     </data>

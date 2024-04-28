@@ -40,6 +40,7 @@ class VehiclePaymentOption(models.Model):
             payment_details = {
                 'product_id': self.invoice_item_id.id,
                 'name': self.name,
+                'analytic_distribution': {self.vehicle_contract_id.vehicle_id.analytic_tag_ids.id: 100},
                 'quantity': 1,
                 'price_unit': self.payment_amount,
                 'tax_ids': tax,
