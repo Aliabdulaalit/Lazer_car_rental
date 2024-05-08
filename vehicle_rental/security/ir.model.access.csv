@@ -9,3 +9,4 @@ vehicle_rental.access_extra_service,access_extra_service,vehicle_rental.model_ex
 vehicle_rental.access_vehicle_damage_image,access_vehicle_damage_image,vehicle_rental.model_vehicle_damage_image,base.group_user,1,1,1,1
 vehicle_rental.access_vehicle_damage,access_vehicle_damage,vehicle_rental.model_vehicle_damage,base.group_user,1,1,1,1
 vehicle_rental.access_vehicle_payment_option,access_vehicle_payment_option,vehicle_rental.model_vehicle_payment_option,base.group_user,1,1,1,1
+vehicle_rental.access_damage,access_damage,vehicle_rental.model_damage,base.group_user,1,1,1,1

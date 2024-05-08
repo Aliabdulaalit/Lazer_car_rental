@@ -104,9 +104,10 @@ class VehicleContract(models.Model):
     total_extra_km = fields.Float(string="Total Extra K/M", default=1)
     total_extra_mi = fields.Float(string="Total Extra Miles", default=1)
     fuel_charges = fields.Float(string="Fuel Charges", default=0)
+    km_charges = fields.Float(string="KM Charges", default=0)
     extra_charge = fields.Monetary(string="Extra Charge")
     total_extra_charges = fields.Monetary(string="Total Extra Charges", compute='_get_total_extra_charges')
-    total_fuel_charges = fields.Monetary(string="Total Fuel Charges", compute='_get_total_extra_charges')
+    # total_fuel_charges = fields.Monetary(string="Total Fuel Charges", compute='_get_total_extra_charges')
 
     start_date = fields.Datetime(string="Pick-up Date", copy=False)
     compute_start_date = fields.Date(string="Compute Start Date", copy=False, compute='compute_date')
@@ -141,6 +142,7 @@ class VehicleContract(models.Model):
     vehicle_damage_image_ids = fields.One2many('vehicle.damage.image', 'vehicle_contract_id')
     insurance_policy_ids = fields.One2many('insurance.policy', 'vehicle_contract_id')
     extra_service_ids = fields.One2many('extra.service', 'vehicle_contract_id')
+    damage_ids = fields.One2many('damage', 'vehicle_contract_id')
     extra_service_charge = fields.Monetary(compute="_total_extra_service_charge", store=True)
 
     description = fields.Text(string="Description")
@@ -463,11 +465,11 @@ class VehicleContract(models.Model):
                     total_extra_charges = rec.extra_charge * rec.total_extra_km
                 elif rec.rent_type == 'mi':
                     total_extra_charges = rec.extra_charge * rec.total_extra_mi
-            rec.total_extra_charges = total_extra_charges
-            if rec.fuel_charges:
-                rec.total_fuel_charges = rec.fuel_charges
-            else:
-                rec.total_fuel_charges = 0
+            rec.total_extra_charges = total_extra_charges + rec.fuel_charges + rec.km_charges
+            # if rec.fuel_charges:
+            #     rec.total_fuel_charges = rec.fuel_charges
+            # else:
+            #     rec.total_fuel_charges = 0
 
     def action_create_extra_charge_invoice(self):
         invoice_lines = []
@@ -571,12 +573,19 @@ class VehicleContract(models.Model):
             #     'price_unit': self.extra_charge,
             # }
             # invoice_lines = [(0, 0, extra_mis)]
-        if self.total_fuel_charges:
+        if self.fuel_charges:
             invoice_lines.append((0, 0, {'product_id': self.env.ref('vehicle_rental.vehicle_rent_fuel_extra_charge').id,
                                          'name': self.vehicle_id.name,
                                          'analytic_distribution': {self.vehicle_id.analytic_tag_ids.id: 100},
                                          'quantity': 1,
-                                         'price_unit': self.total_fuel_charges,
+                                         'price_unit': self.fuel_charges,
+                                         }))
+        if self.km_charges:
+            invoice_lines.append((0, 0, {'product_id': self.env.ref('vehicle_rental.vehicle_rent_km_extra_charge').id,
+                                         'name': self.vehicle_id.name,
+                                         'analytic_distribution': {self.vehicle_id.analytic_tag_ids.id: 100},
+                                         'quantity': 1,
+                                         'price_unit': self.km_charges,
                                          }))
             # fuel_extra_charges = {
             #     'product_id': self.env.ref('vehicle_rental.vehicle_rent_fuel_extra_charge').id,

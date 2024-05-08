@@ -14,6 +14,7 @@ class VehicleDamage(models.TransientModel):
     damage_amount = fields.Monetary(string="Damage Amount")
     company_id = fields.Many2one('res.company', default=lambda self: self.env.company)
     currency_id = fields.Many2one('res.currency', string='Currency', related="company_id.currency_id")
+    damage_date = fields.Date(string="Damage Date")
 
     def vehicle_damage_amount(self):
         rec = self._context.get('active_id')
@@ -31,10 +32,17 @@ class VehicleDamage(models.TransientModel):
                 }
                 return message
             else:
-                vehicle_contract.write({
+                # vehicle_contract.write({
+                #     'description': self.description,
+                #     'damage_amount': self.damage_amount,
+                # })
+                damage_line = {
+                    'vehicle_contract_id': vehicle_contract.id,
                     'description': self.description,
                     'damage_amount': self.damage_amount,
-                })
+                    'damage_date': self.damage_date,
+                }
+                vehicle_contract.damage_ids = [(0, 0, damage_line)]
                 damage_amount = {
                     'product_id': self.env.ref('vehicle_rental.vehicle_damage_amount').id,
                     'name': vehicle_contract.vehicle_id.name,

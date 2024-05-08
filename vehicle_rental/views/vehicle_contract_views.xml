@@ -276,6 +276,9 @@
                                 <field name="fuel_charges"
                                        invisible="is_any_extra_charges == False"
                                        readonly="extra_charge_invoice_id != False"/>
+                                <field name="km_charges"
+                                       invisible="is_any_extra_charges == False"
+                                       readonly="extra_charge_invoice_id != False"/>
 
                                 <label for="total_extra_charges" class="mt-1" string="Total Extra Charges"
                                        invisible="is_any_extra_charges == False"/>
@@ -283,12 +286,12 @@
                                     <field name="total_extra_charges" class="oe_inline"
                                            invisible="is_any_extra_charges == False"/>
                                 </div>
-                                <label for="total_fuel_charges" class="mt-1" string="Total Fuel Extra Charges"
-                                       invisible="is_any_extra_charges == False"/>
-                                <div name="total_fuel_charges">
-                                    <field name="total_fuel_charges" class="oe_inline"
-                                           invisible="is_any_extra_charges == False"/>
-                                </div>
+                                <!--                                <label for="total_fuel_charges" class="mt-1" string="Total Fuel Extra Charges"-->
+                                <!--                                       invisible="is_any_extra_charges == False"/>-->
+                                <!--                                <div name="total_fuel_charges">-->
+                                <!--                                    <field name="total_fuel_charges" class="oe_inline"-->
+                                <!--                                           invisible="is_any_extra_charges == False"/>-->
+                                <!--                                </div>-->
                             </group>
                             <group string="Responsible">
                                 <field name="responsible_id" widget="many2one_avatar_user"
@@ -488,11 +491,34 @@
                             </page>
                             <page name="damage" string="Vehicle Damages" invisible="is_invoice_done == False">
                                 <group>
-                                    <group>
-                                    </group>
-                                    <group>
-                                        <field name="damage_amount" readonly="is_invoice_done != False"/>
-                                    </group>
+                                    <field name="damage_ids"
+                                           readonly="1">
+                                        <tree editable="bottom">
+                                            <field name="vehicle_contract_id"/>
+                                            <field name="description"/>
+                                            <field name="damage_amount"/>
+                                            <field name="company_id" invisible="1"/>
+                                            <field name="currency_id" invisible="1"/>
+                                            <field name="damage_date"/>
+                                        </tree>
+                                    </field>
+                                    <!--                                    <group>-->
+                                    <!--                                        <field name="damage_ids"-->
+                                    <!--                                               readonly="1">-->
+                                    <!--                                            <tree editable="bottom">-->
+                                    <!--                                                <field name="vehicle_contract_id"/>-->
+                                    <!--                                                <field name="description"/>-->
+                                    <!--                                                <field name="damage_amount"/>-->
+                                    <!--                                                <field name="company_id"/>-->
+                                    <!--                                                <field name="currency_id"/>-->
+                                    <!--                                                <field name="damage_date"/>-->
+                                    <!--                                            </tree>-->
+                                    <!--                                        </field>-->
+                                    <!--                                    </group>-->
+                                    <!--                                    <group>-->
+                                    <!--                                        -->
+                                    <!--                                    </group>-->
+                                    <field name="damage_amount" readonly="is_invoice_done != False" invisible="1"/>
                                 </group>
                                 <hr/>
                                 <h6>
