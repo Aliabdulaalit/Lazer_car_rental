@@ -41,6 +41,7 @@
         # Reports
         'report/vehicle_contract_report_views.xml',
         'report/scratch_report_views.xml',
+        'report/report_hire_agreement.xml',
         # Menus
         'views/menus.xml',
     ],

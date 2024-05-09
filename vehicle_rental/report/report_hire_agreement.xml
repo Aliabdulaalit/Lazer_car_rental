@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_hire_agreement" model="report.paperformat">
+        <field name="name">Hire Agreement</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">0</field>
+        <field name="margin_bottom">0</field>
+        <field name="margin_left">0</field>
+        <field name="margin_right">0</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="disable_shrinking" eval="True"/>
+        <field name="dpi">96</field>
+    </record>
+
+    <record id="hire_agreement" model="ir.actions.report">
+        <field name="name">Hire Agreement</field>
+        <field name="model">vehicle.contract</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">vehicle_rental.report_hire_agreement_with_wallpaper</field>
+        <field name="report_file">vehicle_rental.report_hire_agreement_with_wallpaper</field>
+        <field name="print_report_name">'Hire Agreement - %s' % object.reference_no</field>
+        <field name="binding_model_id" ref="model_vehicle_contract"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="vehicle_rental.paperformat_hire_agreement"/>
+    </record>
+
+    <record id="hire_agreement_without_wallpaper" model="ir.actions.report">
+        <field name="name">Hire Agreement without Wallpaper</field>
+        <field name="model">vehicle.contract</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">vehicle_rental.report_hire_agreement</field>
+        <field name="report_file">vehicle_rental.report_hire_agreement</field>
+        <field name="print_report_name">'Hire Agreement - %s' % object.reference_no</field>
+        <field name="binding_model_id" ref="model_vehicle_contract"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="vehicle_rental.paperformat_hire_agreement"/>
+    </record>
+
+    <template id="report_hire_agreement">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="vehicle_rental.report_hire_agreement_template"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_hire_agreement_with_wallpaper">
+        <t t-call="vehicle_rental.report_hire_agreement">
+            <t t-set="print_with_wallpaper" t-value="True"/>
+        </t>
+    </template>
+
+    <template id="report_hire_agreement_template">
+        <t t-call="web.basic_layout">
+            <div class="page">
+                <div t-if="print_with_wallpaper" style="position: absolute; width: 100%;">
+                    <br/>
+
+                    <img src="/vehicle_rental/static/src/img/hire_agreement.jpg"
+                         style="width: 96%"/>
+                </div>
+
+                <span t-field="o.customer_id"
+                      style="position: absolute; margin-top: 239px; margin-left: 84px; font-size: 10px;"/>
+                <span t-field="o.work_name"
+                      style="position: absolute; margin-top: 267px; margin-left: 113px; font-size: 10px;"/>
+                <span t-field="o.residence_address"
+                      style="position: absolute; margin-top: 295px; margin-left: 146px; font-size: 10px;"/>
+                <span t-field="o.customer_phone"
+                      style="position: absolute; margin-top: 322px; margin-left: 202px; font-size: 10px;"/>
+                <span t-field="o.driving_license_no"
+                      style="position: absolute; margin-top: 352px; margin-left: 150px; font-size: 10px;"/>
+                <span t-field="o.issued_place"
+                      style="position: absolute; margin-top: 379px; margin-left: 120px; font-size: 10px;"/>
+                <span t-field="o.expiry_date"
+                      style="position: absolute; margin-top: 406px; margin-left: 114px; font-size: 10px;"/>
+                <span t-field="o.vehicle_id.model_id"
+                      style="position: absolute; margin-top: 433px; margin-left: 114px; font-size: 10px;"/>
+                <span t-field="o.vehicle_id.license_plate"
+                      style="position: absolute; margin-top: 460px; margin-left: 94px; font-size: 10px;"/>
+                <span t-field="o.start_date"
+                      style="position: absolute; margin-top: 486px; margin-left: 128px; font-size: 10px;"/>
+                <span t-field="o.end_date"
+                      style="position: absolute; margin-top: 513px; margin-left: 128px; font-size: 10px;"/>
+
+                <t t-if="o.rent_type == 'hour'">
+                    <strong t-esc="int(o.rent)"
+                            style="position: absolute; margin-top: 389px; margin-left: 584px; font-size: 12px;"/>
+                    <strong t-esc="'{:,.3f}'.format(o.rent).split('.')[1]"
+                            style="position: absolute; margin-top: 389px; margin-left: 666px; font-size: 12px;"/>
+                </t>
+                <t t-elif="o.rent_type == 'days'">
+                    <strong t-esc="int(o.rent)"
+                            style="position: absolute; margin-top: 421px; margin-left: 584px; font-size: 12px;"/>
+                    <strong t-esc="'{:,.3f}'.format(o.rent).split('.')[1]"
+                            style="position: absolute; margin-top: 421px; margin-left: 666px; font-size: 12px;"/>
+                </t>
+                <t t-elif="o.rent_type == 'week'">
+                    <strong t-esc="int(o.rent)"
+                            style="position: absolute; margin-top: 453px; margin-left: 584px; font-size: 12px;"/>
+                    <strong t-esc="'{:,.3f}'.format(o.rent).split('.')[1]"
+                            style="position: absolute; margin-top: 453px; margin-left: 666px; font-size: 12px;"/>
+                </t>
+                <t t-elif="o.rent_type == 'month'">
+                    <strong t-esc="int(o.rent)"
+                            style="position: absolute; margin-top: 485px; margin-left: 584px; font-size: 12px;"/>
+                    <strong t-esc="'{:,.3f}'.format(o.rent).split('.')[1]"
+                            style="position: absolute; margin-top: 485px; margin-left: 666px; font-size: 12px;"/>
+                </t>
+
+                <span t-field="o.related_card_number"
+                      style="position: absolute; margin-top: 643px; margin-left: 385px; font-size: 8px;"/>
+                <span t-field="o.related_card_expiration_date"
+                      style="position: absolute; margin-top: 643px; margin-left: 636px; font-size: 8px;"/>
+                <span t-field="o.related_card_holder_name"
+                      style="position: absolute; margin-top: 660px; margin-left: 369px; font-size: 8px;"/>
+            </div>
+        </t>
+    </template>
+</odoo>
