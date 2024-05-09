@@ -7,6 +7,7 @@ from odoo.exceptions import ValidationError
 class ResCompany(models.Model):
     _inherit = 'res.company'
 
+    fleet_vehicle_expiration_notification_user = fields.Many2one('res.users', 'Send Expiration Notification to')
     fleet_vehicle_expiration_notification_days = fields.Integer(string='Number of Days Before Expiration Notification')
 
     @api.constrains('fleet_vehicle_expiration_notification_days')

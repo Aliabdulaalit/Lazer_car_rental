@@ -6,13 +6,23 @@
         <field name="priority" eval="90"/>
         <field name="inherit_id" ref="fleet.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//app[@name='fleet']//block//setting" position="after">
-                <setting string="Vehicle Expiration Dates">
-                    <div class="text-muted content-group mt16">
-                        <span>Number of Days Before Expiration Notification</span>
-                        <field name="fleet_vehicle_expiration_notification_days" class="text-center" style="width: 10%; min-width: 4rem;"/>
-                    </div>
-                </setting>
+            <xpath expr="//block[@id='end_contract_setting']" position="after">
+                <block title="Vehicle Expiration Notifications" id="vehicle_expiration_dates_setting">
+                    <setting string="Assign to">
+                        <div class="text-muted content-group mt16">
+                            <span>Send expiration notification to </span>
+                            <field name="fleet_vehicle_expiration_notification_user"/>
+                        </div>
+                    </setting>
+                    <setting string="Number of Days Before Expiration Notification">
+                        <div class="text-muted content-group mt16">
+                            <span>Send an alert </span>
+                            <field name="fleet_vehicle_expiration_notification_days" class="text-center"
+                                   style="width: 10%; min-width: 4rem;"/>
+                            <span> days before the expiration date</span>
+                        </div>
+                    </setting>
+                </block>
             </xpath>
         </field>
     </record>

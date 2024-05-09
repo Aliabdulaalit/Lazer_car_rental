@@ -3,6 +3,7 @@
 # Part of TechKhedut. See LICENSE file for full copyright and licensing details.
 import math
 import calendar
+from pytz import timezone
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import ValidationError
@@ -119,7 +120,8 @@ class VehicleContract(models.Model):
     pick_up_country_id = fields.Many2one("res.country")
     pick_up_zip = fields.Char()
 
-    end_date = fields.Datetime(string="Drop-off Date", copy=False)
+    end_date = fields.Datetime(string="Drop-off Date", tracking=True, copy=False)
+    end_date_cron = fields.Many2one('ir.cron', readonly=True)
     drop_off_street = fields.Char(translate=True)
     drop_off_street2 = fields.Char(translate=True)
     drop_off_city = fields.Char(translate=True)
@@ -199,6 +201,35 @@ class VehicleContract(models.Model):
 
                 else:
                     rec.is_equal_date = False
+
+    def set_end_date_cron(self):
+        for rec in self:
+            if rec.end_date_cron:
+                rec.end_date_cron.unlink()
+
+            if rec.end_date and rec.company_id.fleet_vehicle_expiration_notification_user:
+                rec.end_date_cron = self.env['ir.cron'].sudo().create({
+                    'name': f'Contract: {rec.reference_no} drop-off',
+                    'model_id': self.env['ir.model'].sudo().search([('model', '=', 'vehicle.contract')], limit=1).id,
+                    'state': 'code',
+                    'code': f"""
+contract_id = env['vehicle.contract'].sudo().browse({rec.id})
+contract_id.write({{'activity_ids': [(0, 0, {{
+    'res_model_id': env['ir.model'].sudo().search([('model', '=', 'vehicle.contract')], limit=1).id,
+    'activity_type_id': env.ref('mail.mail_activity_data_todo').id,
+    'date_deadline': '{
+        rec.end_date.astimezone(timezone(self.env.context.get('tz', 'UTC'))).replace(tzinfo=None).date()
+    }',
+    'summary': contract_id.reference_no + ' drop-off',
+    'user_id': contract_id.company_id.fleet_vehicle_expiration_notification_user.id
+}})]}})
+                                """,
+                    'nextcall': rec.end_date - relativedelta(
+                        days=self.env.company.fleet_vehicle_expiration_notification_days
+                    ),
+                    'numbercall': 1,
+                    'active': True,
+                })
 
     def action_block_customer(self):
         for rec in self:
@@ -288,7 +319,19 @@ class VehicleContract(models.Model):
         for vals in vals_list:
             if vals.get('reference_no', _('New')) == _('New'):
                 vals['reference_no'] = self.env['ir.sequence'].next_by_code('vehicle.contract') or _('New')
+
         res = super(VehicleContract, self).create(vals_list)
+
+        res.set_end_date_cron()
+
+        return res
+
+    def write(self, vals):
+        res = super(VehicleContract, self).write(vals)
+
+        if 'end_date' in vals:
+            self.set_end_date_cron()
+
         return res
 
     @api.onchange('start_date', 'end_date')
