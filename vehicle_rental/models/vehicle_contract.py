@@ -51,6 +51,7 @@ class VehicleContract(models.Model):
     driver_charge = fields.Monetary(string="Charge")
 
     last_odometer = fields.Float(string="Last Odometer", copy=False)
+    after_receiving_odometer = fields.Float(copy=False)
     odometer_unit = fields.Selection([('kilometers', 'km'), ('miles', 'mi')], 'Odometer Unit',
                                      default='kilometers', copy=False)
     model_year = fields.Char(string="Model", copy=False)
@@ -283,6 +284,9 @@ contract_id.write({{'activity_ids': [(0, 0, {{
 
     def b_in_progress_to_c_return(self):
         for rec in self:
+            if rec.last_odometer > rec.after_receiving_odometer:
+                raise ValidationError(_("After receiving odometer cannot be less than last odometer"))
+            rec.vehicle_id.odometer = rec.after_receiving_odometer
             rec.status = 'c_return'
 
     def c_return_to_d_cancel(self):
@@ -339,28 +343,6 @@ contract_id.write({{'activity_ids': [(0, 0, {{
         for rec in self:
             if not rec.start_date or not rec.end_date:
                 rec.vehicle_id = False
-
-    def vehicle_details_update(self):
-        if self.vehicle_id:
-            if self.vehicle_id.odometer > self.last_odometer:
-                message = {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'type': 'warning',
-                        'message': "Please add a last odometer value greater than the current value",
-                        'sticky': False,
-                    }
-                }
-                return message
-            else:
-                self.vehicle_id.write({
-                    'model_year': self.model_year,
-                    'transmission': self.transmission,
-                    'fuel_type': self.fuel_type,
-                    'odometer': self.last_odometer,
-                    'odometer_unit': self.odometer_unit,
-                })
 
     # @api.onchange('customer_id')
     # def get_customer_details(self):
