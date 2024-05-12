@@ -727,6 +727,7 @@
             <field name="res_model">vehicle.contract</field>
             <field name="view_mode">tree,kanban,form,calendar,pivot,activity,search</field>
             <field name="view_id" ref="vehicle_contract_tree_view"/>
+            <field name="search_view_id" ref="vehicle_contract_search_view"/>
         </record>
     </data>
 </odoo>
