@@ -34,7 +34,6 @@
         'views/vehicle_damage_image_views.xml',
         'views/vehicle_payment_option_views.xml',
         'views/customer_blacklist.xml',
-        'views/daily_rental_report.xml',
         'views/cid_daily_report.xml',
         'views/daily_payment_report.xml',
         'views/res_partner_view.xml',

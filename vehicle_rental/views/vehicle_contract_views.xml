@@ -699,6 +699,8 @@
                     <field name="transmission"/>
                     <field name="fuel_type"/>
                     <field name="last_odometer"/>
+                    <filter name="today" string="Today"
+                            domain="[('start_date', '&gt;', (context_today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d'))]"/>
                     <group string="Group By">
                         <filter name="vehicle_id" string="Vehicles"
                                 context="{'group_by': 'vehicle_id'}"/>

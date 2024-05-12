@@ -30,10 +30,6 @@
                       name="Customer Blacklist"
                       action="action_blacklist_customer"
                       sequence="1"/>
-            <menuitem id="menu_fleet_daily_report"
-                      name="Daily Rental Report"
-                      action="action_daily_rental_report"
-                      sequence="5"/>
             <menuitem id="cid_daily_report_menu"
                       name="CID Daily Report"
                       action="action_vehicles_contracts_cid_daily"
