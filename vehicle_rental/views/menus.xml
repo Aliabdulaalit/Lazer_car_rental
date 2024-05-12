@@ -34,10 +34,14 @@
                       name="Daily Rental Report"
                       action="action_daily_rental_report"
                       sequence="5"/>
+            <menuitem id="cid_daily_report_menu"
+                      name="CID Daily Report"
+                      action="action_vehicles_contracts_cid_daily"
+                      sequence="6"/>
             <menuitem id="menu_fleet_daily__payment_report"
                       name="Daily Payment Report"
                       action="action_daily_payment_report"
-                      sequence="6"/>
+                      sequence="7"/>
         </menuitem>
         <menuitem id="menu_configuration" name="Configurations" parent="main_menu_vehicle_rental" sequence="20"/>
         <menuitem id="menu_cancellation_policy"
