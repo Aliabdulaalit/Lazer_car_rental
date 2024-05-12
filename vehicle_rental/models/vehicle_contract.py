@@ -6,6 +6,8 @@ import calendar
 from pytz import timezone
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from io import BytesIO
+import xlsxwriter
 from odoo.exceptions import ValidationError
 from odoo import models, fields, api, _
 
@@ -975,3 +977,91 @@ contract_id.write({{'activity_ids': [(0, 0, {{
                 super(VehicleContract, rec).unlink()
             else:
                 raise ValidationError(_('You cannot delete the return order.'))
+
+    def generate_xlsx(self):
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/vehicle/contract/export/{",".join([str(contract_id) for contract_id in self.ids])}'
+        }
+
+    @api.model
+    def action_export(self, contract_ids, response):
+        output = BytesIO()
+
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+
+        sheet = workbook.add_worksheet()
+
+        header_format = workbook.add_format({
+            'font_name': 'Courier New',
+            'bold': True,
+            'align': 'center',
+            'valign': 'vcenter',
+            'border': 1,
+            'border_color': '#000000',
+            'bg_color': '#CCCCCC'
+        })
+
+        sheet.merge_range(0, 0, 0, 5, 'Personal Details', header_format)
+        sheet.merge_range(0, 6, 0, 9, 'Vehicle Details', header_format)
+        sheet.merge_range(0, 10, 0, 11, 'Date / Timing', header_format)
+
+        headers = [
+            '#', 'Name', 'CPR / Passport', 'Nationality', 'Mobile', 'Address',
+            'Brand', 'Model', 'Color', 'Plate No.',
+            'Pick-up', 'Drop-off'
+        ]
+
+        max_size = [len(header) for header in headers]
+
+        sheet.write_row(1, 0, headers, header_format)
+
+        sheet.set_row(1, 25)
+
+        data_format = workbook.add_format({
+            'font_name': 'Courier New',
+            'valign': 'vcenter',
+            'border': 1,
+            'border_color': '#000000',
+        })
+
+        row = 2
+        for contract in self.env['vehicle.contract'].browse(contract_ids):
+            data = [
+                str(row - 1),
+                contract.customer_id.name or '',
+                contract.related_cpr or '',
+                contract.nationality.name or '',
+                contract.customer_phone or '',
+                contract.residence_address or '',
+
+                contract.vehicle_id.model_id.brand_id.name or '',
+                contract.vehicle_id.model_id.name or '',
+                contract.vehicle_id.color or '',
+                contract.vehicle_id.license_plate or '',
+
+                str(contract.start_date.astimezone(
+                    timezone(self.env.context.get('tz', 'UTC'))
+                ).replace(tzinfo=None)) if contract.start_date else '',
+                str(contract.end_date.astimezone(
+                    timezone(self.env.context.get('tz', 'UTC'))
+                ).replace(tzinfo=None)) if contract.end_date else '',
+            ]
+
+            sheet.write_row(row, 0, data, data_format)
+
+            for col in range(len(headers)):
+                max_size[col] = max(max_size[col], len(data[col]))
+
+            row += 1
+
+        for col in range(len(headers)):
+            sheet.set_column(col, col, max_size[col])
+
+        workbook.close()
+
+        output.seek(0)
+        response.stream.write(output.read())
+        output.close()
+
+        return output

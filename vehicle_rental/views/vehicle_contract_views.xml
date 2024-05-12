@@ -584,6 +584,9 @@
             <field name="model">vehicle.contract</field>
             <field name="arch" type="xml">
                 <tree>
+                    <header>
+                        <button string="Export" name="generate_xlsx" type="object" class="btn-secondary"/>
+                    </header>
                     <field name="reference_no"/>
                     <field name="vehicle_id"/>
                     <field name="customer_id"/>
@@ -721,6 +724,7 @@
             <field name="name">Contracts</field>
             <field name="res_model">vehicle.contract</field>
             <field name="view_mode">tree,kanban,form,calendar,pivot,activity,search</field>
+            <field name="view_id" ref="vehicle_contract_tree_view"/>
         </record>
     </data>
 </odoo>
