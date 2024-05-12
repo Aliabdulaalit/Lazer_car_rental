@@ -42,7 +42,10 @@ class VehicleContract(models.Model):
     vehicle_ids = fields.Many2many('fleet.vehicle', compute='_get_available_vehicles', string="Vehicles")
     vehicle_id = fields.Many2one('fleet.vehicle', string="Vehicle",
                                  domain="[('id', 'not in', vehicle_ids), ('status', '=', 'available')]", copy=False)
-    license_plate = fields.Char(string="License Plate")
+    vehicle_model = fields.Char(related='vehicle_id.model_id.name')
+    vehicle_brand_id = fields.Many2one(related='vehicle_id.model_id.brand_id')
+    vehicle_license_plate = fields.Char(related='vehicle_id.license_plate')
+    vehicle_color = fields.Char(related='vehicle_id.color')
 
     is_driver_required = fields.Boolean(string="Driver Required")
     is_equal_date = fields.Boolean(string="Is Equal Date", compute='compute_is_equal_date', store=1)
@@ -368,7 +371,6 @@ contract_id.write({{'activity_ids': [(0, 0, {{
                 rec.model_year = rec.vehicle_id.model_year
                 rec.transmission = rec.vehicle_id.transmission
                 rec.fuel_type = rec.vehicle_id.fuel_type
-                rec.license_plate = rec.vehicle_id.license_plate
 
     @api.onchange('cancellation_policy_id')
     def get_policy_terms(self):
