@@ -983,7 +983,7 @@ contract_id.write({{'activity_ids': [(0, 0, {{
     def generate_xlsx(self):
         return {
             'type': 'ir.actions.act_url',
-            'url': f'/vehicle/contract/export/{",".join([str(contract_id) for contract_id in self.ids])}'
+            'url': f'{self.env.context["route"]}/{",".join([str(contract_id) for contract_id in self.ids])}'
         }
 
     @api.model
@@ -1056,6 +1056,136 @@ contract_id.write({{'activity_ids': [(0, 0, {{
                 max_size[col] = max(max_size[col], len(data[col]))
 
             row += 1
+
+        for col in range(len(headers)):
+            sheet.set_column(col, col, max_size[col])
+
+        workbook.close()
+
+        output.seek(0)
+        response.stream.write(output.read())
+        output.close()
+
+        return output
+
+    @api.model
+    def action_print_rental_deposit(self, contract_ids, response):
+        output = BytesIO()
+
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+
+        sheet = workbook.add_worksheet()
+
+        header_format = workbook.add_format({
+            'font_name': 'Courier New',
+            'bold': True,
+            'align': 'center',
+            'valign': 'vcenter',
+            'border': 1,
+            'border_color': '#000000',
+            'bg_color': '#CCCCCC'
+        })
+
+        headers = ['S/N', 'NAME', 'ARG NO', 'CAR NO', 'RECEIPT', 'AMOUNT', 'PAYMENT TYPE']
+
+        max_size = [len(header) for header in headers]
+
+        sheet.write_row(0, 0, headers, header_format)
+
+        data_format = workbook.add_format({
+            'font_name': 'Courier New',
+            'valign': 'vcenter',
+            'border': 1,
+            'border_color': '#000000',
+        })
+
+        row = 1
+        for contract in self.env['vehicle.contract'].browse(contract_ids):
+            for invoice in self.env['account.move'].search([('vehicle_contract_id', '=', contract.id)]):
+                for payment in invoice.payment_ids.filtered(lambda p: p.state == 'posted'):
+                    data = [
+                        str(row),
+                        contract.customer_id.name or '',
+                        contract.reference_no or '',
+                        contract.vehicle_id.license_plate or '',
+                        invoice.name or '',
+                        str('{:,.3f}'.format(payment.amount)) or '',
+                        payment.journal_id.name or '',
+                    ]
+
+                    sheet.write_row(row, 0, data, data_format)
+
+                    for col in range(len(headers)):
+                        max_size[col] = max(max_size[col], len(data[col]))
+
+                    row += 1
+
+        for col in range(len(headers)):
+            sheet.set_column(col, col, max_size[col])
+
+        workbook.close()
+
+        output.seek(0)
+        response.stream.write(output.read())
+        output.close()
+
+        return output
+
+    @api.model
+    def action_print_damage_deposit(self, contract_ids, response):
+        output = BytesIO()
+
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+
+        sheet = workbook.add_worksheet()
+
+        header_format = workbook.add_format({
+            'font_name': 'Courier New',
+            'bold': True,
+            'align': 'center',
+            'valign': 'vcenter',
+            'border': 1,
+            'border_color': '#000000',
+            'bg_color': '#CCCCCC'
+        })
+
+        headers = ['S/N', 'NAME', 'ARG NO', 'CAR NO', 'RECEIPT', 'RATE', 'SPAN', 'AMOUNT', 'PAYMENT TYPE']
+
+        max_size = [len(header) for header in headers]
+
+        sheet.write_row(0, 0, headers, header_format)
+
+        data_format = workbook.add_format({
+            'font_name': 'Courier New',
+            'valign': 'vcenter',
+            'border': 1,
+            'border_color': '#000000',
+        })
+
+        row = 1
+        for contract in self.env['vehicle.contract'].browse(contract_ids):
+            for invoice in self.env['account.move'].search([('vehicle_contract_id', '=', contract.id)]):
+                for payment in invoice.payment_ids.filtered(lambda p: p.state == 'posted'):
+                    data = [
+                        str(row),
+                        contract.customer_id.name or '',
+                        contract.reference_no or '',
+                        contract.vehicle_id.license_plate or '',
+                        invoice.name or '',
+                        str('{:,.3f}'.format(contract.rent)) or '',
+                        dict(self.env['vehicle.contract'].fields_get(
+                            allfields=['rent_type']
+                        )['rent_type']['selection']).get(contract.rent_type) or '',
+                        str('{:,.3f}'.format(payment.amount)) or '',
+                        payment.journal_id.name or '',
+                    ]
+
+                    sheet.write_row(row, 0, data, data_format)
+
+                    for col in range(len(headers)):
+                        max_size[col] = max(max_size[col], len(data[col]))
+
+                    row += 1
 
         for col in range(len(headers)):
             sheet.set_column(col, col, max_size[col])

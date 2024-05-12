@@ -585,7 +585,12 @@
             <field name="arch" type="xml">
                 <tree>
                     <header>
-                        <button string="Export" name="generate_xlsx" type="object" class="btn-secondary"/>
+                        <button string="Export" name="generate_xlsx" type="object" class="btn-secondary"
+                                context="{'route': '/vehicle/contract/export'}"/>
+                        <button string="Print Rental Deposit" name="generate_xlsx" type="object" class="btn-secondary"
+                                context="{'route': '/contract/rental/deposit'}"/>
+                        <button string="Print Damage Deposit" name="generate_xlsx" type="object" class="btn-secondary"
+                                context="{'route': '/contract/damage/deposit'}"/>
                     </header>
                     <field name="reference_no"/>
                     <field name="vehicle_id"/>
