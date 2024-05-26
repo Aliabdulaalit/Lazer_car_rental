@@ -704,6 +704,8 @@
                     <field name="transmission"/>
                     <field name="fuel_type"/>
                     <field name="last_odometer"/>
+                    <field name="customer_phone"/>
+                    <field name="related_cpr"/>
                     <filter name="today" string="Today"
                             domain="[('start_date', '&gt;', (context_today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d'))]"/>
                     <group string="Group By">
