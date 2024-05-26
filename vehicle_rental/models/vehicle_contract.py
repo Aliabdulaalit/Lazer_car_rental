@@ -156,7 +156,7 @@ class VehicleContract(models.Model):
     description = fields.Text(string="Description")
     damage_amount = fields.Monetary(string="Damage Amount")
 
-    tax_ids = fields.Many2many('account.tax', string='Taxes')
+    tax_ids = fields.Many2many('account.tax', string='Taxes', domain=[('type_tax_use', '=', 'sale')])
     invoice_id = fields.Many2one('account.move')
     is_invoice_done = fields.Boolean()
     invoice_count = fields.Integer(compute='_compute_invoice_count')
