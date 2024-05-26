@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_invoice_document" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[@name='address_not_same_as_shipping']/t/div" position="after">
+            <t>Phone: <span t-field="o.partner_id.phone"/></t>
+        </xpath>
+
+        <xpath expr="//div[@name='address_same_as_shipping']/t/div" position="after">
+            <t>Phone: <span t-field="o.partner_id.phone"/></t>
+        </xpath>
+
+        <xpath expr="//div[@name='no_shipping']/t/div" position="after">
+            <t>Phone: <span t-field="o.partner_id.phone"/></t>
+        </xpath>
+    </template>
+</odoo>

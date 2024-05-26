@@ -38,6 +38,7 @@
         'views/daily_payment_report.xml',
         'views/res_partner_view.xml',
         'views/res_config_settings_views.xml',
+        'views/report_invoice.xml',
         # Reports
         'report/vehicle_contract_report_views.xml',
         'report/scratch_report_views.xml',
