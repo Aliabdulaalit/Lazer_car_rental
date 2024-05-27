@@ -125,13 +125,13 @@
                         </group>
                         <group string="Vehicle Details">
                             <group>
-                                <field name="vehicle_id"
+                                <field name="unavailable_vehicle_ids" invisible="1"/>
+                                <field name="vehicle_id" required="1"
                                        readonly="start_date == False or end_date == False or status != 'a_draft'"
-                                       required="start_date != False or end_date != False"/>
+                                       domain="[('id', 'not in', unavailable_vehicle_ids)]"/>
                                 <field name="compute_start_date" invisible="0"/>
                                 <field name="is_equal_date" invisible="0"/>
                                 <field name="vehicle_license_plate" invisible="1"/>
-                                <field name="vehicle_ids" invisible="1"/>
                                 <field name="model_year" readonly="1" force_save="1"/>
                                 <field name="transmission" readonly="1" force_save="1"/>
                                 <field name="fuel_type" readonly="1" force_save="1"/>

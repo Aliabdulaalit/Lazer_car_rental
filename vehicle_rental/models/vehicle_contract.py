@@ -39,7 +39,7 @@ class VehicleContract(models.Model):
 
     reference_no = fields.Char(string='Reference No', required=True, readonly=True, default=lambda self: _('New'),
                                copy=False)
-    vehicle_ids = fields.Many2many('fleet.vehicle', compute='_get_available_vehicles', string="Vehicles")
+    unavailable_vehicle_ids = fields.Many2many('fleet.vehicle')
     vehicle_id = fields.Many2one('fleet.vehicle', string="Vehicle",
                                  domain="[('id', 'not in', vehicle_ids), ('status', '=', 'available')]", copy=False)
     vehicle_model = fields.Char(related='vehicle_id.model_id.name')
@@ -421,13 +421,19 @@ contract_id.write({{'activity_ids': [(0, 0, {{
                 extra_service_charge = extra_service_charge + (charge.amount * charge.product_qty)
             rec.extra_service_charge = extra_service_charge
 
-    @api.depends('vehicle_id', 'start_date', 'end_date')
-    def _get_available_vehicles(self):
+    @api.onchange('start_date', 'end_date')
+    def _compute_unavailable_vehicle_ids(self):
         for rec in self:
-            contract_id = self.env['vehicle.contract'].sudo().search(
-                [('start_date', '<=', rec.end_date), ('end_date', '>=', rec.start_date),
-                 ('status', '=', 'b_in_progress')]).mapped('vehicle_id').mapped('id')
-            rec.vehicle_ids = contract_id
+            if rec.start_date and rec.end_date:
+                rec.unavailable_vehicle_ids = self.env['vehicle.contract'].search([
+                    ('status', '=', 'b_in_progress'),
+                    '|',
+                    '&', ('start_date', '>=', rec.start_date), ('start_date', '<=', rec.end_date),
+                    '&', ('end_date', '>=', rec.start_date), ('end_date', '<=', rec.end_date),
+                ]).vehicle_id
+            else:
+                rec.unavailable_vehicle_ids = None
+            rec.vehicle_id = None
 
     @api.constrains('start_date', 'end_date')
     def _contract_check_dates(self):
