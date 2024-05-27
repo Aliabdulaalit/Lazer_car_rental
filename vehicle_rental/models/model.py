@@ -152,6 +152,13 @@ class RentalInvoice(models.Model):
     _description = __doc__
 
     vehicle_contract_id = fields.Many2one('vehicle.contract', string="Vehicle Contract")
+    vehicle_contract_invoice_type = fields.Selection([
+        ('deposit', 'Deposit'),
+        ('rent', 'Rent'),
+        ('extra_charges', 'Extra Charges'),
+        ('extra_fuel_charges', 'Extra Fuel Charges'),
+        ('damage', 'Damage')
+    ], default=None)
 
 
 class RentalDeposit(models.Model):
@@ -160,3 +167,25 @@ class RentalDeposit(models.Model):
     _description = __doc__
 
     vehicle_contract_id = fields.Many2one('vehicle.contract', string="Vehicle Contract")
+    vehicle_contract_invoice_type = fields.Selection([
+        ('deposit', 'Deposit'),
+        ('rent', 'Rent'),
+        ('extra_charges', 'Extra Charges'),
+        ('extra_fuel_charges', 'Extra Fuel Charges'),
+        ('damage', 'Damage')
+    ], default=None)
+
+
+class AccountPaymentRegister(models.TransientModel):
+    _inherit = 'account.payment.register'
+
+    def _create_payment_vals_from_wizard(self, batch_result):
+        payment_vals = super(AccountPaymentRegister, self)._create_payment_vals_from_wizard(batch_result)
+
+        for line in batch_result['lines']:
+            if line.move_id.vehicle_contract_id:
+                payment_vals['vehicle_contract_id'] = line.move_id.vehicle_contract_id.id
+                payment_vals['vehicle_contract_invoice_type'] = line.move_id.vehicle_contract_invoice_type
+                break
+
+        return payment_vals

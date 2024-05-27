@@ -51,7 +51,8 @@ class VehiclePaymentOption(models.Model):
             'move_type': 'out_invoice',
             'invoice_date': self.payment_date,
             'invoice_line_ids': invoice_lines,
-            'vehicle_contract_id': self.vehicle_contract_id.id
+            'vehicle_contract_id': self.vehicle_contract_id.id,
+            'vehicle_contract_invoice_type': 'rent'
         }
         invoice_id = self.env['account.move'].sudo().create(data)
         self.invoice_id = invoice_id

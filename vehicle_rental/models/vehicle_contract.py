@@ -110,10 +110,13 @@ class VehicleContract(models.Model):
 
     total_extra_km = fields.Float(string="Total Extra K/M", default=1)
     total_extra_mi = fields.Float(string="Total Extra Miles", default=1)
-    fuel_charges = fields.Float(string="Fuel Charges", default=0)
     km_charges = fields.Float(string="KM Charges", default=0)
     extra_charge = fields.Monetary(string="Extra Charge")
     total_extra_charges = fields.Monetary(string="Total Extra Charges", compute='_get_total_extra_charges')
+
+    has_extra_fuel_charges = fields.Boolean("Extra Fuel Charges ?")
+    fuel_charges = fields.Float()
+    extra_fuel_charges_invoice_id = fields.Many2one('account.move', readonly=True)
     # total_fuel_charges = fields.Monetary(string="Total Fuel Charges", compute='_get_total_extra_charges')
 
     start_date = fields.Datetime(string="Pick-up Date", copy=False)
@@ -319,7 +322,8 @@ contract_id.write({{'activity_ids': [(0, 0, {{
                     'payment_type': 'inbound',
                     'amount': self.deposit,
                     'journal_id': self.journal_id.id,
-                    'vehicle_contract_id': self.id
+                    'vehicle_contract_id': self.id,
+                    'vehicle_contract_invoice_type': 'deposit'
                 }
                 account_payment_id = self.env['account.payment'].sudo().create(data)
                 account_payment_id.action_post()
@@ -502,7 +506,7 @@ contract_id.write({{'activity_ids': [(0, 0, {{
                     total_extra_charges = rec.extra_charge * rec.total_extra_km
                 elif rec.rent_type == 'mi':
                     total_extra_charges = rec.extra_charge * rec.total_extra_mi
-            rec.total_extra_charges = total_extra_charges + rec.fuel_charges + rec.km_charges
+            rec.total_extra_charges = total_extra_charges + rec.km_charges
             # if rec.fuel_charges:
             #     rec.total_fuel_charges = rec.fuel_charges
             # else:
@@ -610,14 +614,6 @@ contract_id.write({{'activity_ids': [(0, 0, {{
             #     'price_unit': self.extra_charge,
             # }
             # invoice_lines = [(0, 0, extra_mis)]
-        if self.fuel_charges:
-            invoice_lines.append((0, 0, {'product_id': self.env.ref('vehicle_rental.vehicle_rent_fuel_extra_charge').id,
-                                         'name': self.vehicle_id.name,
-                                         'analytic_distribution': {self.vehicle_id.analytic_tag_ids.id: 100},
-                                         'quantity': 1,
-                                         'price_unit': self.fuel_charges,
-                                         'tax_ids': [(6, 0, self.fuel_tax_ids.ids)]
-                                         }))
         if self.km_charges:
             invoice_lines.append((0, 0, {'product_id': self.env.ref('vehicle_rental.vehicle_rent_km_extra_charge').id,
                                          'name': self.vehicle_id.name,
@@ -638,7 +634,8 @@ contract_id.write({{'activity_ids': [(0, 0, {{
             'move_type': 'out_invoice',
             'invoice_date': fields.Date.today(),
             'invoice_line_ids': invoice_lines,
-            'vehicle_contract_id': self.id
+            'vehicle_contract_id': self.id,
+            'vehicle_contract_invoice_type': 'extra_charges'
         }
         extra_charge_invoice_id = self.env['account.move'].sudo().create(data)
         extra_charge_invoice_id.action_post()
@@ -651,6 +648,38 @@ contract_id.write({{'activity_ids': [(0, 0, {{
             'view_mode': 'form',
             'target': 'current'
         }
+
+    def action_create_extra_fuel_charges_invoice(self):
+        self.ensure_one()
+
+        if self.fuel_charges > 0.0:
+            self.extra_fuel_charges_invoice_id = self.env['account.move'].create({
+                'partner_id': self.customer_id.id,
+                'move_type': 'out_invoice',
+                'invoice_date': fields.Date.today(),
+                'invoice_line_ids': [(0, 0, {
+                    'product_id': self.env.ref('vehicle_rental.vehicle_rent_fuel_extra_charge').id,
+                    'name': self.vehicle_id.name,
+                    'analytic_distribution': {self.vehicle_id.analytic_tag_ids.id: 100},
+                    'quantity': 1,
+                    'price_unit': self.fuel_charges,
+                    'tax_ids': [(6, 0, self.fuel_tax_ids.ids)]
+                })],
+                'vehicle_contract_id': self.id,
+                'vehicle_contract_invoice_type': 'extra_fuel_charges'
+            })
+            self.extra_fuel_charges_invoice_id.action_post()
+
+            return {
+                'name': _('%s Extra Fuel Charges Invoice' % self.reference_no),
+                'view_mode': 'form',
+                'res_model': 'account.move',
+                'res_id': self.extra_fuel_charges_invoice_id.id,
+                'type': 'ir.actions.act_window',
+                'target': 'current'
+            }
+        else:
+            raise ValidationError(_("Fuel charges must be positive."))
 
     def action_create_vehicle_payment(self):
         for rec in self:

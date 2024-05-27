@@ -37,13 +37,6 @@ class VehicleDamage(models.TransientModel):
                 #     'description': self.description,
                 #     'damage_amount': self.damage_amount,
                 # })
-                damage_line = {
-                    'vehicle_contract_id': vehicle_contract.id,
-                    'description': self.description,
-                    'damage_amount': self.damage_amount,
-                    'damage_date': self.damage_date,
-                }
-                vehicle_contract.damage_ids = [(0, 0, damage_line)]
                 damage_amount = {
                     'product_id': self.env.ref('vehicle_rental.vehicle_damage_amount').id,
                     'name': vehicle_contract.vehicle_id.name,
@@ -57,10 +50,19 @@ class VehicleDamage(models.TransientModel):
                     'move_type': 'out_invoice',
                     'invoice_date': fields.Date.today(),
                     'invoice_line_ids': invoice_lines,
-                    'vehicle_contract_id': vehicle_contract.id
+                    'vehicle_contract_id': vehicle_contract.id,
+                    'vehicle_contract_invoice_type': 'damage'
                 }
                 invoice_id = self.env['account.move'].sudo().create(data)
                 invoice_id.action_post()
+                damage_line = {
+                    'vehicle_contract_id': vehicle_contract.id,
+                    'description': self.description,
+                    'damage_amount': self.damage_amount,
+                    'damage_date': self.damage_date,
+                    'move_id': invoice_id.id,
+                }
+                vehicle_contract.damage_ids = [(0, 0, damage_line)]
                 vehicle_contract.is_invoice_done = True
                 return {
                     'type': 'ir.actions.act_window',
