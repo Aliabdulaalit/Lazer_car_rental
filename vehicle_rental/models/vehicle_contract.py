@@ -1130,7 +1130,7 @@ contract_id.write({{'activity_ids': [(0, 0, {{
             'bg_color': '#CCCCCC'
         })
 
-        headers = ['S/N', 'NAME', 'ARG NO', 'CAR NO', 'RECEIPT', 'AMOUNT', 'PAYMENT TYPE']
+        headers = ['S/N', 'NAME', 'ARG NO', 'CAR NO', 'RECEIPT', 'RATE', 'SPAN', 'AMOUNT', 'PAYMENT TYPE']
 
         max_size = [len(header) for header in headers]
 
@@ -1143,17 +1143,33 @@ contract_id.write({{'activity_ids': [(0, 0, {{
             'border_color': '#000000',
         })
 
+        fuel_charges_details = {}
+        collection_details = {}
+
         row = 1
         for contract in self.env['vehicle.contract'].browse(contract_ids):
             for payment in self.env['account.payment'].search([('vehicle_contract_id', '=', contract.id)]).filtered(
                 lambda p: p.state == 'posted'
             ):
+                if payment.vehicle_contract_invoice_type == 'extra_fuel_charges':
+                    fuel_charges_details.update({
+                        payment.journal_id.id: fuel_charges_details.get(payment.journal_id.id, 0.0) + payment.amount
+                    })
+                elif payment.vehicle_contract_invoice_type == 'deposit':
+                    collection_details.update({
+                        payment.journal_id.id: collection_details.get(payment.journal_id.id, 0.0) + payment.amount
+                    })
+
                 data = [
                     str(row),
                     contract.customer_id.name or '',
                     contract.reference_no or '',
                     contract.vehicle_id.license_plate or '',
                     ', '.join(payment.reconciled_invoice_ids.mapped('name')) or '',
+                    str('{:,.3f}'.format(contract.rent)) or '',
+                    dict(self.env['vehicle.contract'].fields_get(
+                        allfields=['rent_type']
+                    )['rent_type']['selection']).get(contract.rent_type) or '',
                     str('{:,.3f}'.format(payment.amount)) or '',
                     payment.journal_id.name or '',
                 ]
@@ -1164,6 +1180,40 @@ contract_id.write({{'activity_ids': [(0, 0, {{
                     max_size[col] = max(max_size[col], len(data[col]))
 
                 row += 1
+
+        row += 1
+
+        sheet.merge_range(row, 3, row, 4, 'FUEL CHARGES DETAILS', header_format)
+
+        details_row = row + 1
+        for k, v in fuel_charges_details.items():
+            data = self.env['account.journal'].browse(k).name or ''
+
+            sheet.write(details_row, 3, data or '', data_format)
+
+            max_size[3] = max(max_size[3], len(data))
+
+            data = str('{:,.3f}'.format(v)) or ''
+
+            sheet.write(details_row, 4, data or '', data_format)
+
+            max_size[4] = max(max_size[4], len(data))
+
+        sheet.merge_range(row, 7, row, 8, 'COLLECTION DETAILS', header_format)
+
+        details_row = row + 1
+        for k, v in collection_details.items():
+            data = self.env['account.journal'].browse(k).name or ''
+
+            sheet.write(details_row, 7, data or '', data_format)
+
+            max_size[7] = max(max_size[7], len(data))
+
+            data = str('{:,.3f}'.format(v)) or ''
+
+            sheet.write(details_row, 8, data or '', data_format)
+
+            max_size[8] = max(max_size[8], len(data))
 
         for col in range(len(headers)):
             sheet.set_column(col, col, max_size[col])
@@ -1194,7 +1244,7 @@ contract_id.write({{'activity_ids': [(0, 0, {{
             'bg_color': '#CCCCCC'
         })
 
-        headers = ['S/N', 'NAME', 'ARG NO', 'CAR NO', 'RECEIPT', 'RATE', 'SPAN', 'AMOUNT', 'PAYMENT TYPE']
+        headers = ['S/N', 'NAME', 'ARG NO', 'CAR NO', 'RECEIPT', 'AMOUNT', 'PAYMENT TYPE']
 
         max_size = [len(header) for header in headers]
 
@@ -1207,21 +1257,23 @@ contract_id.write({{'activity_ids': [(0, 0, {{
             'border_color': '#000000',
         })
 
+        collection_details = {}
+
         row = 1
         for contract in self.env['vehicle.contract'].browse(contract_ids):
             for payment in self.env['account.payment'].search([('vehicle_contract_id', '=', contract.id)]).filtered(
                 lambda p: p.state == 'posted'
             ):
+                if payment.vehicle_contract_invoice_type == 'deposit':
+                    collection_details.update({
+                        payment.journal_id.id: collection_details.get(payment.journal_id.id, 0.0) + payment.amount
+                    })
                 data = [
                     str(row),
                     contract.customer_id.name or '',
                     contract.reference_no or '',
                     contract.vehicle_id.license_plate or '',
                     ', '.join(payment.reconciled_invoice_ids.mapped('name')) or '',
-                    str('{:,.3f}'.format(contract.rent)) or '',
-                    dict(self.env['vehicle.contract'].fields_get(
-                        allfields=['rent_type']
-                    )['rent_type']['selection']).get(contract.rent_type) or '',
                     str('{:,.3f}'.format(payment.amount)) or '',
                     payment.journal_id.name or '',
                 ]
@@ -1232,6 +1284,27 @@ contract_id.write({{'activity_ids': [(0, 0, {{
                     max_size[col] = max(max_size[col], len(data[col]))
 
                 row += 1
+
+        row += 1
+
+        sheet.merge_range(row, 5, row, 6, 'COLLECTION DETAILS', header_format)
+
+        row += 1
+        for k, v in collection_details.items():
+            data = self.env['account.journal'].browse(k).name or ''
+
+            sheet.write(row, 5, data or '', data_format)
+
+            max_size[5] = max(max_size[5], len(data))
+
+            data = str('{:,.3f}'.format(v)) or ''
+
+            sheet.write(row, 6, data or '', data_format)
+
+            max_size[6] = max(max_size[6], len(data))
+
+        for col in range(len(headers)):
+            sheet.set_column(col, col, max_size[col])
 
         for col in range(len(headers)):
             sheet.set_column(col, col, max_size[col])
