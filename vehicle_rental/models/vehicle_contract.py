@@ -1200,3 +1200,128 @@ contract_id.write({{'activity_ids': [(0, 0, {{
         output.close()
 
         return output
+
+    @api.model
+    def action_export_cid_daily(self, contract_ids, response):
+        output = BytesIO()
+
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+
+        sheet = workbook.add_worksheet()
+
+        header_format = workbook.add_format({
+            'font_name': 'Courier New',
+            'bold': True,
+            'align': 'center',
+            'valign': 'vcenter',
+            'border': 1,
+            'border_color': '#000000',
+            'bg_color': '#CCCCCC'
+        })
+
+        headers = [
+            'Name', 'CPR / Passport', 'Nationality', 'Mobile', 'Address',
+            'Brand', 'Model', 'Color', 'Plate No.',
+            'Pick-up', 'Drop-off'
+        ]
+
+        max_size = [len(header) for header in headers]
+
+        sheet.write_row(0, 0, headers, header_format)
+
+        subtitle_format = workbook.add_format({
+            'font_name': 'Courier New',
+            'bold': True,
+            'align': 'center',
+            'valign': 'vcenter',
+        })
+
+        data_format = workbook.add_format({
+            'font_name': 'Courier New',
+            'valign': 'vcenter',
+            'border': 1,
+            'border_color': '#000000',
+        })
+
+        now = datetime.now()
+
+        start_date = now.astimezone(
+            timezone(self.env.context.get('tz', 'UTC'))
+        ).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+        end_date = start_date + relativedelta(days=1)
+
+        def get_data(contract):
+            return [
+                contract.customer_id.name or '',
+                contract.related_cpr or '',
+                contract.nationality.name or '',
+                contract.customer_phone or '',
+                contract.residence_address or '',
+
+                contract.vehicle_id.model_id.brand_id.name or '',
+                contract.vehicle_id.model_id.name or '',
+                contract.vehicle_id.color or '',
+                contract.vehicle_id.license_plate or '',
+
+                str(contract.start_date.astimezone(
+                    timezone(self.env.context.get('tz', 'UTC'))
+                ).replace(tzinfo=None)) if contract.start_date else '',
+                str(contract.end_date.astimezone(
+                    timezone(self.env.context.get('tz', 'UTC'))
+                ).replace(tzinfo=None)) if contract.end_date else '',
+            ]
+
+        row = 1
+
+        vehicles_in = self.env['vehicle.contract'].browse(contract_ids).filtered(
+            lambda c: start_date <= c.end_date.astimezone(
+                timezone(self.env.context.get('tz', 'UTC'))
+            ).replace(tzinfo=None) < end_date
+        )
+
+        if vehicles_in:
+            sheet.merge_range(row, 0, row, len(headers) - 1, 'Vehicles In', subtitle_format)
+
+            row += 1
+
+            for contract in vehicles_in:
+                data = get_data(contract)
+
+                sheet.write_row(row, 0, data, data_format)
+
+                for col in range(len(headers)):
+                    max_size[col] = max(max_size[col], len(data[col]))
+
+                row += 1
+
+        vehicles_out = self.env['vehicle.contract'].browse(contract_ids).filtered(
+            lambda c: start_date <= c.start_date.astimezone(
+                timezone(self.env.context.get('tz', 'UTC'))
+            ).replace(tzinfo=None) < end_date
+        )
+
+        if vehicles_out:
+            sheet.merge_range(row, 0, row, len(headers) - 1, 'Vehicles Out', subtitle_format)
+
+            row += 1
+
+            for contract in vehicles_out:
+                data = get_data(contract)
+
+                sheet.write_row(row, 0, data, data_format)
+
+                for col in range(len(headers)):
+                    max_size[col] = max(max_size[col], len(data[col]))
+
+                row += 1
+
+        for col in range(len(headers)):
+            sheet.set_column(col, col, max_size[col])
+
+        workbook.close()
+
+        output.seek(0)
+        response.stream.write(output.read())
+        output.close()
+
+        return output
