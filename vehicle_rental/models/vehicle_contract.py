@@ -1143,24 +1143,25 @@ contract_id.write({{'activity_ids': [(0, 0, {{
 
         row = 1
         for contract in self.env['vehicle.contract'].browse(contract_ids):
-            for invoice in self.env['account.move'].search([('vehicle_contract_id', '=', contract.id)]):
-                for payment in invoice.payment_ids.filtered(lambda p: p.state == 'posted'):
-                    data = [
-                        str(row),
-                        contract.customer_id.name or '',
-                        contract.reference_no or '',
-                        contract.vehicle_id.license_plate or '',
-                        invoice.name or '',
-                        str('{:,.3f}'.format(payment.amount)) or '',
-                        payment.journal_id.name or '',
-                    ]
+            for payment in self.env['account.payment'].search([('vehicle_contract_id', '=', contract.id)]).filtered(
+                lambda p: p.state == 'posted'
+            ):
+                data = [
+                    str(row),
+                    contract.customer_id.name or '',
+                    contract.reference_no or '',
+                    contract.vehicle_id.license_plate or '',
+                    ', '.join(payment.reconciled_invoice_ids.mapped('name')) or '',
+                    str('{:,.3f}'.format(payment.amount)) or '',
+                    payment.journal_id.name or '',
+                ]
 
-                    sheet.write_row(row, 0, data, data_format)
+                sheet.write_row(row, 0, data, data_format)
 
-                    for col in range(len(headers)):
-                        max_size[col] = max(max_size[col], len(data[col]))
+                for col in range(len(headers)):
+                    max_size[col] = max(max_size[col], len(data[col]))
 
-                    row += 1
+                row += 1
 
         for col in range(len(headers)):
             sheet.set_column(col, col, max_size[col])
@@ -1206,28 +1207,29 @@ contract_id.write({{'activity_ids': [(0, 0, {{
 
         row = 1
         for contract in self.env['vehicle.contract'].browse(contract_ids):
-            for invoice in self.env['account.move'].search([('vehicle_contract_id', '=', contract.id)]):
-                for payment in invoice.payment_ids.filtered(lambda p: p.state == 'posted'):
-                    data = [
-                        str(row),
-                        contract.customer_id.name or '',
-                        contract.reference_no or '',
-                        contract.vehicle_id.license_plate or '',
-                        invoice.name or '',
-                        str('{:,.3f}'.format(contract.rent)) or '',
-                        dict(self.env['vehicle.contract'].fields_get(
-                            allfields=['rent_type']
-                        )['rent_type']['selection']).get(contract.rent_type) or '',
-                        str('{:,.3f}'.format(payment.amount)) or '',
-                        payment.journal_id.name or '',
-                    ]
+            for payment in self.env['account.payment'].search([('vehicle_contract_id', '=', contract.id)]).filtered(
+                lambda p: p.state == 'posted'
+            ):
+                data = [
+                    str(row),
+                    contract.customer_id.name or '',
+                    contract.reference_no or '',
+                    contract.vehicle_id.license_plate or '',
+                    ', '.join(payment.reconciled_invoice_ids.mapped('name')) or '',
+                    str('{:,.3f}'.format(contract.rent)) or '',
+                    dict(self.env['vehicle.contract'].fields_get(
+                        allfields=['rent_type']
+                    )['rent_type']['selection']).get(contract.rent_type) or '',
+                    str('{:,.3f}'.format(payment.amount)) or '',
+                    payment.journal_id.name or '',
+                ]
 
-                    sheet.write_row(row, 0, data, data_format)
+                sheet.write_row(row, 0, data, data_format)
 
-                    for col in range(len(headers)):
-                        max_size[col] = max(max_size[col], len(data[col]))
+                for col in range(len(headers)):
+                    max_size[col] = max(max_size[col], len(data[col]))
 
-                    row += 1
+                row += 1
 
         for col in range(len(headers)):
             sheet.set_column(col, col, max_size[col])
