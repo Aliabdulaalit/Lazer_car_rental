@@ -156,7 +156,9 @@ class VehicleContract(models.Model):
     description = fields.Text(string="Description")
     damage_amount = fields.Monetary(string="Damage Amount")
 
-    tax_ids = fields.Many2many('account.tax', string='Taxes', domain=[('type_tax_use', '=', 'sale')])
+    tax_ids = fields.Many2many('account.tax', string='Rent Taxes', domain=[('type_tax_use', '=', 'sale')])
+    fuel_tax_ids = fields.Many2many('account.tax', 'contract_fuel_tax', 'contract_id', 'fuel_tax_id',
+                                    string='Extra Fuel Taxes', domain=[('type_tax_use', '=', 'sale')])
     invoice_id = fields.Many2one('account.move')
     is_invoice_done = fields.Boolean()
     invoice_count = fields.Integer(compute='_compute_invoice_count')
@@ -608,6 +610,7 @@ contract_id.write({{'activity_ids': [(0, 0, {{
                                          'analytic_distribution': {self.vehicle_id.analytic_tag_ids.id: 100},
                                          'quantity': 1,
                                          'price_unit': self.fuel_charges,
+                                         'tax_ids': [(6, 0, self.fuel_tax_ids.ids)]
                                          }))
         if self.km_charges:
             invoice_lines.append((0, 0, {'product_id': self.env.ref('vehicle_rental.vehicle_rent_km_extra_charge').id,

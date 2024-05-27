@@ -204,6 +204,7 @@
                             </group>
                             <group>
                                 <field name="tax_ids" widget='many2many_tags' readonly="installment_created != False"/>
+                                <field name="fuel_tax_ids" widget='many2many_tags' readonly="installment_created != False"/>
                             </group>
                         </group>
 

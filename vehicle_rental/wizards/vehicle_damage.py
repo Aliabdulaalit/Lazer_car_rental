@@ -12,6 +12,7 @@ class VehicleDamage(models.TransientModel):
     is_any_damage = fields.Boolean(string="Any Damage")
     description = fields.Text(string="Description")
     damage_amount = fields.Monetary(string="Damage Amount")
+    tax_ids = fields.Many2many('account.tax', string='Taxes', domain=[('type_tax_use', '=', 'sale')])
     company_id = fields.Many2one('res.company', default=lambda self: self.env.company)
     currency_id = fields.Many2one('res.currency', string='Currency', related="company_id.currency_id")
     damage_date = fields.Date(string="Damage Date")
@@ -48,6 +49,7 @@ class VehicleDamage(models.TransientModel):
                     'name': vehicle_contract.vehicle_id.name,
                     'quantity': 1,
                     'price_unit': self.damage_amount,
+                    'tax_ids': [(6, 0, self.tax_ids.ids)],
                 }
                 invoice_lines = [(0, 0, damage_amount)]
                 data = {
