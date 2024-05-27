@@ -334,6 +334,23 @@
                                 </div>
                             </group>
                             <group>
+                                <label for="extra_fuel_charges_invoice_id" invisible="not extra_fuel_charges_invoice_id"/>
+                                <div class="address_format">
+                                    <field name="extra_fuel_charges_invoice_id" readonly="1" style="width: auto"
+                                           invisible="not has_extra_fuel_charges or not extra_fuel_charges_invoice_id"/>
+                                    <strong>
+                                        <field name="extra_fuel_charges_payment_state" widget="badge"
+                                               decoration-success="extra_fuel_charges_payment_state == 'paid'"
+                                               decoration-danger="extra_fuel_charges_payment_state == 'not_paid'"
+                                               decoration-info="extra_fuel_charges_payment_state == 'in_payment'"
+                                               decoration-primary="extra_fuel_charges_payment_state == 'partial'"
+                                               decoration-warning="extra_fuel_charges_payment_state == 'reversed'"
+                                               invisible="not extra_fuel_charges_invoice_id"
+                                               style="margin-left: 15px; width: auto;" nolabel="1"/>
+                                    </strong>
+                                </div>
+                            </group>
+                            <group>
                                 <label for="extra_service_invoice_id" string="Extra Service Invoice"
                                        invisible="extra_service_invoice_id == False"/>
                                 <div class="address_format">

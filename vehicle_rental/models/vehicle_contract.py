@@ -117,6 +117,8 @@ class VehicleContract(models.Model):
     has_extra_fuel_charges = fields.Boolean("Extra Fuel Charges ?")
     fuel_charges = fields.Float()
     extra_fuel_charges_invoice_id = fields.Many2one('account.move', readonly=True)
+    extra_fuel_charges_payment_state = fields.Selection(related='extra_fuel_charges_invoice_id.payment_state',
+                                                        string='Extra Fuel Charges Payment State')
     # total_fuel_charges = fields.Monetary(string="Total Fuel Charges", compute='_get_total_extra_charges')
 
     start_date = fields.Datetime(string="Pick-up Date", copy=False)
