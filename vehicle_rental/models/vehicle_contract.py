@@ -911,7 +911,8 @@ contract_id.write({{'activity_ids': [(0, 0, {{
             'move_type': 'out_invoice',
             'invoice_date': fields.Date.today(),
             'invoice_line_ids': invoice_lines,
-            'vehicle_contract_id': self.id
+            'vehicle_contract_id': self.id,
+            'vehicle_contract_invoice_type': 'extra_services'
         }
         extra_service_invoice_id = self.env['account.move'].sudo().create(data)
         extra_service_invoice_id.action_post()
@@ -944,7 +945,9 @@ contract_id.write({{'activity_ids': [(0, 0, {{
 
     def _compute_invoice_count(self):
         for rec in self:
-            invoice_count = self.env['account.move'].search_count([('vehicle_contract_id', '=', rec.id)])
+            invoice_count = self.env['account.move'].search_count([
+                ('vehicle_contract_id', '=', rec.id), ('move_type', '=', 'out_invoice')
+            ])
             rec.invoice_count = invoice_count
         return True
 
@@ -953,7 +956,7 @@ contract_id.write({{'activity_ids': [(0, 0, {{
             'type': 'ir.actions.act_window',
             'name': _('Invoices'),
             'res_model': 'account.move',
-            'domain': [('vehicle_contract_id', '=', self.id)],
+            'domain': [('vehicle_contract_id', '=', self.id), ('move_type', '=', 'out_invoice')],
             'context': {
                 'default_vehicle_contract_id': self.id,
                 'create': False,
@@ -988,7 +991,8 @@ contract_id.write({{'activity_ids': [(0, 0, {{
             'move_type': 'out_invoice',
             'invoice_date': fields.Date.today(),
             'invoice_line_ids': invoice_line,
-            'vehicle_contract_id': self.id
+            'vehicle_contract_id': self.id,
+            'vehicle_contract_invoice_type': 'cancellation'
         }
         cancellation_invoice_id = self.env['account.move'].sudo().create(data)
         cancellation_invoice_id.action_post()

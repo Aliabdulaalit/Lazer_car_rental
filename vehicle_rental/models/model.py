@@ -157,7 +157,9 @@ class RentalInvoice(models.Model):
         ('rent', 'Rent'),
         ('extra_charges', 'Extra Charges'),
         ('extra_fuel_charges', 'Extra Fuel Charges'),
-        ('damage', 'Damage')
+        ('extra_services', 'Extra Services'),
+        ('damage', 'Damage'),
+        ('cancellation', 'Cancellation')
     ], default=None)
 
 
@@ -172,7 +174,9 @@ class RentalDeposit(models.Model):
         ('rent', 'Rent'),
         ('extra_charges', 'Extra Charges'),
         ('extra_fuel_charges', 'Extra Fuel Charges'),
-        ('damage', 'Damage')
+        ('extra_services', 'Extra Services'),
+        ('damage', 'Damage'),
+        ('cancellation', 'Cancellation')
     ], default=None)
 
 
