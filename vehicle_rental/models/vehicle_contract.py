@@ -1148,9 +1148,10 @@ contract_id.write({{'activity_ids': [(0, 0, {{
 
         row = 1
         for contract in self.env['vehicle.contract'].browse(contract_ids):
-            for payment in self.env['account.payment'].search([('vehicle_contract_id', '=', contract.id)]).filtered(
-                lambda p: p.state == 'posted'
-            ):
+            for payment in self.env['account.payment'].search([
+                ('state', '=', 'posted'),
+                ('vehicle_contract_id', '=', contract.id)
+            ]):
                 if payment.vehicle_contract_invoice_type == 'extra_fuel_charges':
                     fuel_charges_details.update({
                         payment.journal_id.id: fuel_charges_details.get(payment.journal_id.id, 0.0) + payment.amount
@@ -1181,39 +1182,42 @@ contract_id.write({{'activity_ids': [(0, 0, {{
 
                 row += 1
 
-        row += 1
+        if fuel_charges_details or collection_details:
+            row += 1
 
-        sheet.merge_range(row, 3, row, 4, 'FUEL CHARGES DETAILS', header_format)
+            if fuel_charges_details:
+                sheet.merge_range(row, 3, row, 4, 'FUEL CHARGES DETAILS', header_format)
 
-        details_row = row + 1
-        for k, v in fuel_charges_details.items():
-            data = self.env['account.journal'].browse(k).name or ''
+                details_row = row + 1
+                for k, v in fuel_charges_details.items():
+                    data = self.env['account.journal'].browse(k).name or ''
 
-            sheet.write(details_row, 3, data or '', data_format)
+                    sheet.write(details_row, 3, data or '', data_format)
 
-            max_size[3] = max(max_size[3], len(data))
+                    max_size[3] = max(max_size[3], len(data))
 
-            data = str('{:,.3f}'.format(v)) or ''
+                    data = str('{:,.3f}'.format(v)) or ''
 
-            sheet.write(details_row, 4, data or '', data_format)
+                    sheet.write(details_row, 4, data or '', data_format)
 
-            max_size[4] = max(max_size[4], len(data))
+                    max_size[4] = max(max_size[4], len(data))
 
-        sheet.merge_range(row, 7, row, 8, 'COLLECTION DETAILS', header_format)
+            if collection_details:
+                sheet.merge_range(row, 7, row, 8, 'COLLECTION DETAILS', header_format)
 
-        details_row = row + 1
-        for k, v in collection_details.items():
-            data = self.env['account.journal'].browse(k).name or ''
+                details_row = row + 1
+                for k, v in collection_details.items():
+                    data = self.env['account.journal'].browse(k).name or ''
 
-            sheet.write(details_row, 7, data or '', data_format)
+                    sheet.write(details_row, 7, data or '', data_format)
 
-            max_size[7] = max(max_size[7], len(data))
+                    max_size[7] = max(max_size[7], len(data))
 
-            data = str('{:,.3f}'.format(v)) or ''
+                    data = str('{:,.3f}'.format(v)) or ''
 
-            sheet.write(details_row, 8, data or '', data_format)
+                    sheet.write(details_row, 8, data or '', data_format)
 
-            max_size[8] = max(max_size[8], len(data))
+                    max_size[8] = max(max_size[8], len(data))
 
         for col in range(len(headers)):
             sheet.set_column(col, col, max_size[col])
@@ -1261,13 +1265,15 @@ contract_id.write({{'activity_ids': [(0, 0, {{
 
         row = 1
         for contract in self.env['vehicle.contract'].browse(contract_ids):
-            for payment in self.env['account.payment'].search([('vehicle_contract_id', '=', contract.id)]).filtered(
-                lambda p: p.state == 'posted'
-            ):
-                if payment.vehicle_contract_invoice_type == 'deposit':
-                    collection_details.update({
-                        payment.journal_id.id: collection_details.get(payment.journal_id.id, 0.0) + payment.amount
-                    })
+            for payment in self.env['account.payment'].search([
+                ('state', '=', 'posted'),
+                ('vehicle_contract_id', '=', contract.id),
+                ('vehicle_contract_invoice_type', '=', 'damage')
+            ]):
+                collection_details.update({
+                    payment.journal_id.id: collection_details.get(payment.journal_id.id, 0.0) + payment.amount
+                })
+
                 data = [
                     str(row),
                     contract.customer_id.name or '',
@@ -1285,26 +1291,24 @@ contract_id.write({{'activity_ids': [(0, 0, {{
 
                 row += 1
 
-        row += 1
+        if collection_details:
+            row += 1
 
-        sheet.merge_range(row, 5, row, 6, 'COLLECTION DETAILS', header_format)
+            sheet.merge_range(row, 5, row, 6, 'COLLECTION DETAILS', header_format)
 
-        row += 1
-        for k, v in collection_details.items():
-            data = self.env['account.journal'].browse(k).name or ''
+            row += 1
+            for k, v in collection_details.items():
+                data = self.env['account.journal'].browse(k).name or ''
 
-            sheet.write(row, 5, data or '', data_format)
+                sheet.write(row, 5, data or '', data_format)
 
-            max_size[5] = max(max_size[5], len(data))
+                max_size[5] = max(max_size[5], len(data))
 
-            data = str('{:,.3f}'.format(v)) or ''
+                data = str('{:,.3f}'.format(v)) or ''
 
-            sheet.write(row, 6, data or '', data_format)
+                sheet.write(row, 6, data or '', data_format)
 
-            max_size[6] = max(max_size[6], len(data))
-
-        for col in range(len(headers)):
-            sheet.set_column(col, col, max_size[col])
+                max_size[6] = max(max_size[6], len(data))
 
         for col in range(len(headers)):
             sheet.set_column(col, col, max_size[col])
