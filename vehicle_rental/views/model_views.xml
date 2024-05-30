@@ -50,17 +50,20 @@
                 <xpath expr="//form//sheet" position="before">
                     <header>
                         <field name="status" widget="statusbar"/>
-                        <button string="Under Maintenance" name="available_to_in_maintenance" type="object"
-                                invisible="status == 'in_maintenance'"/>
-                        <button string="Available" name="in_maintenance_to_available" type="object"
-                                invisible="status == 'available'"/>
+                        <button string="Under Maintenance" name="in_maintenance" type="object"
+                                invisible="status != 'available'"/>
+                        <button string="Unavailable" name="unavailable" type="object"
+                                invisible="status != 'available'"/>
+                        <button string="Available" name="available" type="object" invisible="status == 'available'"/>
                     </header>
                 </xpath>
                 <xpath expr="//field[@name='image_128']" position='before'>
                     <widget name="web_ribbon" title="Available" bg_color="bg-success"
-                            invisible="status == 'in_maintenance'"/>
+                            invisible="status != 'available'"/>
                     <widget name="web_ribbon" title="In Maintenance" bg_color="bg-danger"
-                            invisible="status == 'available'"/>
+                            invisible="status != 'in_maintenance'"/>
+                    <widget name="web_ribbon" title="Unavailable" bg_color="bg-danger"
+                            invisible="status != 'unavailable'"/>
                 </xpath>
                 <xpath expr="//form/sheet/group" position="inside">
                     <group string="Rent Details">

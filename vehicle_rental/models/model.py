@@ -29,8 +29,11 @@ class FleetVehicle(models.Model):
     extra_charge_hour = fields.Monetary(string="Charge / Hour")
     extra_charge_year = fields.Monetary(string="Charge / Year")
 
-    status = fields.Selection([('available', 'Available'), ('in_maintenance', 'Under Maintenance')],
-                              string="Status", default="available")
+    status = fields.Selection([
+        ('available', 'Available'),
+        ('in_maintenance', 'Under Maintenance'),
+        ('unavailable', 'Unavailable'),
+    ], default="available")
     user_id = fields.Many2one('res.users', required=True,
                               domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
 
@@ -131,11 +134,14 @@ vehicle_id.write({{'activity_ids': [(0, 0, {{
 
         return res
 
-    def available_to_in_maintenance(self):
+    def in_maintenance(self):
         self.status = 'in_maintenance'
 
-    def in_maintenance_to_available(self):
+    def available(self):
         self.status = 'available'
+
+    def unavailable(self):
+        self.status = 'unavailable'
 
 
 class FleetVehicleLogContract(models.Model):
