@@ -1189,6 +1189,8 @@ contract_id.write({{'activity_ids': [(0, 0, {{
 
                     max_size[4] = max(max_size[4], len(data))
 
+                    details_row += 1
+
             if collection_details:
                 sheet.merge_range(row, 7, row, 8, 'COLLECTION DETAILS', header_format)
 
@@ -1205,6 +1207,8 @@ contract_id.write({{'activity_ids': [(0, 0, {{
                     sheet.write(details_row, 8, data or '', data_format)
 
                     max_size[8] = max(max_size[8], len(data))
+
+                    details_row += 1
 
         for col in range(len(headers)):
             sheet.set_column(col, col, max_size[col])
@@ -1296,6 +1300,8 @@ contract_id.write({{'activity_ids': [(0, 0, {{
                 sheet.write(row, 6, data or '', data_format)
 
                 max_size[6] = max(max_size[6], len(data))
+
+                row += 1
 
         for col in range(len(headers)):
             sheet.set_column(col, col, max_size[col])
