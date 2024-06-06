@@ -101,7 +101,7 @@
                                 </div>
                             </group>
                             <group>
-                                <field name="end_date" required="1" readonly="status != 'a_draft'"/>
+                                <field name="end_date" readonly="status != 'a_draft'"/>
                                 <span class="o_form_label o_td_label" name="address_name">
                                     <strong>Drop-Off Location</strong>
                                 </span>

@@ -93,7 +93,7 @@ class VehicleContract(models.Model):
 
     rent_type = fields.Selection([('hour', "Hours"), ('days', "Days"), ('week', "Weeks"), ('month', "Months"),
                                   ('year', "Years"), ('km', "Kilometers"), ('mi', 'Miles')], string="Rent Type")
-    total_days = fields.Float(string="Total Days", compute="_total_rental_days")
+    total_days = fields.Float(string="Total Days")
     total_km = fields.Float(string="Total Kilometers", default=1)
     total_mi = fields.Float(string="Total Miles", default=1)
     rent = fields.Monetary(string="Rent")
@@ -433,28 +433,6 @@ contract_id.write({{'activity_ids': [(0, 0, {{
         for record in self:
             if record.start_date > record.end_date:
                 raise ValidationError(_("Please ensure that the Drop-off Date is greater than the Pick-up Date"))
-
-    @api.depends('rent_type', 'start_date', 'end_date')
-    def _total_rental_days(self):
-        for rec in self:
-            count = 0.0
-            if rec.end_date and rec.start_date and not (rec.start_date > rec.end_date):
-                if rec.rent_type == 'days':
-                    count = (rec.end_date - rec.start_date).days
-                elif rec.rent_type == 'week':
-                    count = (rec.end_date - rec.start_date).days / 7
-                elif rec.rent_type == 'month':
-                    delta_months = (rec.end_date.year - rec.start_date.year) * 12 + (
-                            rec.end_date.month - rec.start_date.month)
-                    count = delta_months + (rec.end_date.day - rec.start_date.day) / 30
-                elif rec.rent_type == 'hour':
-                    count = (rec.end_date - rec.start_date).total_seconds() / 3600
-                elif rec.rent_type == 'year':
-                    delta_years = rec.end_date.year - rec.start_date.year
-                    remaining_months = rec.end_date.month - rec.start_date.month
-                    remaining_days = (rec.end_date.day - rec.start_date.day) / 30
-                    count = delta_years + remaining_months / 12 + remaining_days / 365
-            rec.total_days = round(count, 2)
 
     @api.depends('total_vehicle_rent', 'rent_type', 'rent', 'total_days', 'driver_charge', 'total_km',
                  'driver_charge_type', 'total_mi')
