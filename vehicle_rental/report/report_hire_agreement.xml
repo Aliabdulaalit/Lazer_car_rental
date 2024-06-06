@@ -64,59 +64,59 @@
                 </div>
 
                 <span t-field="o.customer_id"
-                      style="position: absolute; margin-top: 239px; margin-left: 84px; font-size: 10px;"/>
+                      style="position: absolute; margin-top: 239px; margin-left: 90px; font-size: 10px;"/>
                 <span t-field="o.work_name"
-                      style="position: absolute; margin-top: 267px; margin-left: 113px; font-size: 10px;"/>
+                      style="position: absolute; margin-top: 267px; margin-left: 122px; font-size: 10px;"/>
                 <span t-field="o.residence_address"
-                      style="position: absolute; margin-top: 295px; margin-left: 146px; font-size: 10px;"/>
+                      style="position: absolute; margin-top: 294px; margin-left: 165px; font-size: 10px;"/>
                 <span t-field="o.customer_phone"
-                      style="position: absolute; margin-top: 322px; margin-left: 202px; font-size: 10px;"/>
+                      style="position: absolute; margin-top: 322px; margin-left: 243px; font-size: 10px;"/>
                 <span t-field="o.driving_license_no"
-                      style="position: absolute; margin-top: 352px; margin-left: 150px; font-size: 10px;"/>
+                      style="position: absolute; margin-top: 349px; margin-left: 165px; font-size: 10px;"/>
                 <span t-field="o.issued_place"
-                      style="position: absolute; margin-top: 379px; margin-left: 120px; font-size: 10px;"/>
+                      style="position: absolute; margin-top: 376px; margin-left: 126px; font-size: 10px;"/>
                 <span t-field="o.expiry_date"
-                      style="position: absolute; margin-top: 406px; margin-left: 114px; font-size: 10px;"/>
+                      style="position: absolute; margin-top: 404px; margin-left: 128px; font-size: 10px;"/>
                 <span t-field="o.vehicle_id.model_id"
-                      style="position: absolute; margin-top: 433px; margin-left: 114px; font-size: 10px;"/>
+                      style="position: absolute; margin-top: 431px; margin-left: 122px; font-size: 10px;"/>
                 <span t-field="o.vehicle_id.license_plate"
-                      style="position: absolute; margin-top: 460px; margin-left: 94px; font-size: 10px;"/>
+                      style="position: absolute; margin-top: 458px; margin-left: 96px; font-size: 10px;"/>
                 <span t-field="o.start_date"
-                      style="position: absolute; margin-top: 486px; margin-left: 128px; font-size: 10px;"/>
+                      style="position: absolute; margin-top: 486px; margin-left: 147px; font-size: 10px;"/>
                 <span t-field="o.end_date"
-                      style="position: absolute; margin-top: 513px; margin-left: 128px; font-size: 10px;"/>
+                      style="position: absolute; margin-top: 513px; margin-left: 136px; font-size: 10px;"/>
 
                 <t t-if="o.rent_type == 'hour'">
                     <strong t-esc="int(o.rent)"
-                            style="position: absolute; margin-top: 389px; margin-left: 584px; font-size: 12px;"/>
+                            style="position: absolute; margin-top: 387px; margin-left: 583px; font-size: 12px;"/>
                     <strong t-esc="'{:,.3f}'.format(o.rent).split('.')[1]"
-                            style="position: absolute; margin-top: 389px; margin-left: 666px; font-size: 12px;"/>
+                            style="position: absolute; margin-top: 387px; margin-left: 664px; font-size: 12px;"/>
                 </t>
                 <t t-elif="o.rent_type == 'days'">
                     <strong t-esc="int(o.rent)"
-                            style="position: absolute; margin-top: 421px; margin-left: 584px; font-size: 12px;"/>
+                            style="position: absolute; margin-top: 420px; margin-left: 583px; font-size: 12px;"/>
                     <strong t-esc="'{:,.3f}'.format(o.rent).split('.')[1]"
-                            style="position: absolute; margin-top: 421px; margin-left: 666px; font-size: 12px;"/>
+                            style="position: absolute; margin-top: 420px; margin-left: 664px; font-size: 12px;"/>
                 </t>
                 <t t-elif="o.rent_type == 'week'">
                     <strong t-esc="int(o.rent)"
-                            style="position: absolute; margin-top: 453px; margin-left: 584px; font-size: 12px;"/>
+                            style="position: absolute; margin-top: 451px; margin-left: 583px; font-size: 12px;"/>
                     <strong t-esc="'{:,.3f}'.format(o.rent).split('.')[1]"
-                            style="position: absolute; margin-top: 453px; margin-left: 666px; font-size: 12px;"/>
+                            style="position: absolute; margin-top: 451px; margin-left: 664px; font-size: 12px;"/>
                 </t>
                 <t t-elif="o.rent_type == 'month'">
                     <strong t-esc="int(o.rent)"
-                            style="position: absolute; margin-top: 485px; margin-left: 584px; font-size: 12px;"/>
+                            style="position: absolute; margin-top: 482px; margin-left: 583px; font-size: 12px;"/>
                     <strong t-esc="'{:,.3f}'.format(o.rent).split('.')[1]"
-                            style="position: absolute; margin-top: 485px; margin-left: 666px; font-size: 12px;"/>
+                            style="position: absolute; margin-top: 482px; margin-left: 664px; font-size: 12px;"/>
                 </t>
 
                 <span t-field="o.related_card_number"
-                      style="position: absolute; margin-top: 643px; margin-left: 385px; font-size: 8px;"/>
+                      style="position: absolute; margin-top: 646px; margin-left: 377px; font-size: 10px;"/>
                 <span t-field="o.related_card_expiration_date"
-                      style="position: absolute; margin-top: 643px; margin-left: 636px; font-size: 8px;"/>
+                      style="position: absolute; margin-top: 646px; margin-left: 633px; font-size: 10px;"/>
                 <span t-field="o.related_card_holder_name"
-                      style="position: absolute; margin-top: 660px; margin-left: 369px; font-size: 8px;"/>
+                      style="position: absolute; margin-top: 665px; margin-left: 365px; font-size: 10px;"/>
             </div>
         </t>
     </template>
