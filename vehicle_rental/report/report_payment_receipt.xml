@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_payment_receipt" model="report.paperformat">
+        <field name="name">Payment Receipt</field>
+        <field name="default" eval="True"/>
+        <field name="format">A5</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">0</field>
+        <field name="margin_bottom">0</field>
+        <field name="margin_left">0</field>
+        <field name="margin_right">0</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="disable_shrinking" eval="True"/>
+        <field name="dpi">96</field>
+    </record>
+
+    <record id="payment_receipt" model="ir.actions.report">
+        <field name="name">Payment Receipt</field>
+        <field name="model">account.payment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">vehicle_rental.report_payment_receipt_with_wallpaper</field>
+        <field name="report_file">vehicle_rental.report_payment_receipt_with_wallpaper</field>
+        <field name="print_report_name">'Payment Receipt - %s' % object.name</field>
+        <field name="binding_model_id" ref="account.model_account_payment"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="vehicle_rental.paperformat_payment_receipt"/>
+    </record>
+
+    <record id="payment_receipt_without_wallpaper" model="ir.actions.report">
+        <field name="name">Payment Receipt without Wallpaper</field>
+        <field name="model">account.payment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">vehicle_rental.report_payment_receipt</field>
+        <field name="report_file">vehicle_rental.report_payment_receipt</field>
+        <field name="print_report_name">'Payment Receipt - %s' % object.name</field>
+        <field name="binding_model_id" ref="account.model_account_payment"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="vehicle_rental.paperformat_payment_receipt"/>
+    </record>
+
+    <template id="report_payment_receipt">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="vehicle_rental.report_payment_receipt_template"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_payment_receipt_with_wallpaper">
+        <t t-call="vehicle_rental.report_payment_receipt">
+            <t t-set="print_with_wallpaper" t-value="True"/>
+        </t>
+    </template>
+
+    <template id="report_payment_receipt_template">
+        <t t-call="web.basic_layout">
+            <div class="page">
+                <div t-if="print_with_wallpaper" style="position: absolute; width: 100%;">
+                    <br/>
+
+                    <img src="/vehicle_rental/static/src/img/payment_receipt.jpg"
+                         style="width: 96%"/>
+                </div>
+
+                <span t-field="o.vehicle_contract_id.vehicle_id.license_plate"
+                      style="position: absolute; margin-top: 125px; margin-left: 109px; font-size: 10px;"/>
+                <span t-field="o.date"
+                      style="position: absolute; margin-top: 146px; margin-left: 538px; font-size: 10px;"/>
+                <span t-field="o.partner_id"
+                      style="position: absolute; margin-top: 189px; margin-left: 121px; font-size: 10px;"/>
+                <span t-field="o.amount_total_words"
+                      style="position: absolute; margin-top: 229px; margin-left: 102px; font-size: 10px;"/>
+
+                <strong t-esc="int(o.amount)"
+                        style="position: absolute; margin-top: 478px; margin-left: 586px; font-size: 12px;"/>
+                <strong t-esc="'{:,.3f}'.format(o.amount).split('.')[1]"
+                        style="position: absolute; margin-top: 478px; margin-left: 658px; font-size: 12px;"/>
+            </div>
+        </t>
+    </template>
+</odoo>
