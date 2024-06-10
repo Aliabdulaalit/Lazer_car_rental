@@ -22,6 +22,17 @@
                 <xpath expr="//field[@name='journal_id']" position="before">
                     <field name="vehicle_contract_id" readonly="1" force_save="1"/>
                 </xpath>
+
+                <xpath expr="//group[@name='main_group']" position="after">
+                    <group name="rent_dates" invisible="not vehicle_contract_id">
+                        <group>
+                            <field name="rent_from"/>
+                        </group>
+                        <group>
+                            <field name="rent_to"/>
+                        </group>
+                    </group>
+                </xpath>
             </field>
         </record>
 

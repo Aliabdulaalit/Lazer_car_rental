@@ -184,6 +184,8 @@ class RentalDeposit(models.Model):
         ('damage', 'Damage'),
         ('cancellation', 'Cancellation')
     ], default=None)
+    rent_from = fields.Datetime()
+    rent_to = fields.Datetime()
 
 
 class AccountPaymentRegister(models.TransientModel):
