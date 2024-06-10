@@ -161,6 +161,7 @@ class VehicleContract(models.Model):
     damage_amount = fields.Monetary(string="Damage Amount")
 
     tax_ids = fields.Many2many('account.tax', string='Rent Taxes', domain=[('type_tax_use', '=', 'sale')])
+    amount_tax = fields.Float(string='Total Rent Tax', compute='_compute_amount_tax', store=True, precompute=True)
     fuel_tax_ids = fields.Many2many('account.tax', 'contract_fuel_tax', 'contract_id', 'fuel_tax_id',
                                     string='Extra Fuel Taxes', domain=[('type_tax_use', '=', 'sale')])
     invoice_id = fields.Many2one('account.move')
@@ -226,6 +227,21 @@ class VehicleContract(models.Model):
     def _compute_payment_method_line_fields(self):
         for rec in self:
             rec.available_payment_method_line_ids = rec.journal_id._get_available_payment_method_lines('inbound')
+
+    @api.depends('total_vehicle_rent', 'tax_ids')
+    def _compute_amount_tax(self):
+        for rec in self:
+            rec.amount_tax = list(self.env['account.tax']._compute_taxes([
+                self.env['account.tax']._convert_to_tax_base_line_dict(
+                    rec,
+                    partner=rec.customer_id,
+                    currency=rec.currency_id,
+                    product=self.env.ref('vehicle_rental.vehicle_rent_charge'),
+                    taxes=rec.tax_ids,
+                    price_unit=rec.total_vehicle_rent,
+                    quantity=1,
+                )
+            ])['totals'].values())[0]['amount_tax']
 
     @api.depends('start_date')
     def compute_is_equal_date(self):
