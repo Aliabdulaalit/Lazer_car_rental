@@ -64,43 +64,58 @@
                 </div>
 
                 <strong t-field="o.vehicle_contract_id.vehicle_id.license_plate"
-                        style="position: absolute; margin-top: 123px; margin-left: 109px; font-size: 12px;"/>
+                        style="position: absolute; white-space: nowrap; margin-top: 123px; margin-left: 109px;
+                               font-size: 12px;"/>
                 <strong t-field="o.date"
-                        style="position: absolute; margin-top: 144px; margin-left: 538px; font-size: 12px;"/>
+                        style="position: absolute; white-space: nowrap; margin-top: 144px; margin-left: 538px;
+                               font-size: 12px;"/>
                 <strong t-field="o.partner_id"
-                        style="position: absolute; margin-top: 187px; margin-left: 121px; font-size: 12px;"/>
+                        style="position: absolute; white-space: nowrap; margin-top: 187px; margin-left: 121px;
+                               font-size: 12px;"/>
                 <strong t-field="o.amount_total_words"
-                        style="position: absolute; margin-top: 227px; margin-left: 102px; font-size: 12px;"/>
+                        style="position: absolute; white-space: nowrap; margin-top: 227px; margin-left: 102px;
+                               font-size: 12px;"/>
 
                 <strong t-if="o.payment_method_line_type == 'cash'" t-esc="'✓'"
-                        style="position: absolute; margin-top: 248px; margin-left: 69px; font-size: 43px;"/>
+                        style="position: absolute; white-space: nowrap; margin-top: 248px; margin-left: 69px;
+                               font-size: 43px;"/>
                 <strong t-elif="o.payment_method_line_type == 'card'" t-esc="'✓'"
-                        style="position: absolute; margin-top: 248px; margin-left: 225px; font-size: 43px;"/>
+                        style="position: absolute; white-space: nowrap; margin-top: 248px; margin-left: 225px;
+                               font-size: 43px;"/>
                 <strong t-elif="o.payment_method_line_type == 'cheque'" t-esc="'✓'"
-                        style="position: absolute; margin-top: 248px; margin-left: 423px; font-size: 43px;"/>
+                        style="position: absolute; white-space: nowrap; margin-top: 248px; margin-left: 423px;
+                               font-size: 43px;"/>
                 <strong t-elif="o.payment_method_line_type == 'bank_transfer'" t-esc="'✓'"
-                        style="position: absolute; margin-top: 248px; margin-left: 639px; font-size: 43px;"/>
+                        style="position: absolute; white-space: nowrap; margin-top: 248px; margin-left: 639px;
+                               font-size: 43px;"/>
 
                 <t t-if="o.payment_method_line_type == 'cheque'">
                     <strong t-field="o.cheque_date"
-                            style="position: absolute; margin-top: 306px; margin-left: 74px; font-size: 12px;"/>
+                            style="position: absolute; white-space: nowrap; margin-top: 306px; margin-left: 74px;
+                                   font-size: 12px;"/>
                     <strong t-field="o.cheque_number"
-                            style="position: absolute; margin-top: 306px; margin-left: 316px; font-size: 12px;"/>
+                            style="position: absolute; white-space: nowrap; margin-top: 306px; margin-left: 316px;
+                                   font-size: 12px;"/>
                     <strong t-field="o.cheque_bank_id"
-                            style="position: absolute; margin-top: 306px; margin-left: 567px; font-size: 12px; nowrap"/>
+                            style="position: absolute; white-space: nowrap; margin-top: 306px; margin-left: 567px;
+                                   font-size: 12px;"/>
                 </t>
 
                 <t t-if="o.vehicle_contract_id">
                     <strong t-field="o.rent_from"
-                            style="position: absolute; margin-top: 346px; margin-left: 132px; font-size: 12px;"/>
+                            style="position: absolute; white-space: nowrap; margin-top: 346px; margin-left: 132px;
+                                   font-size: 12px;"/>
                     <strong t-field="o.rent_to"
-                            style="position: absolute; margin-top: 346px; margin-left: 430px; font-size: 12px;"/>
+                            style="position: absolute; white-space: nowrap; margin-top: 346px; margin-left: 430px;
+                                   font-size: 12px;"/>
                 </t>
 
                 <strong t-esc="int(o.amount)"
-                        style="position: absolute; margin-top: 476px; margin-left: 586px; font-size: 14px;"/>
+                        style="position: absolute; white-space: nowrap; margin-top: 476px; margin-left: 586px;
+                               font-size: 14px;"/>
                 <strong t-esc="'{:,.3f}'.format(o.amount).split('.')[1]"
-                        style="position: absolute; margin-top: 476px; margin-left: 658px; font-size: 14px;"/>
+                        style="position: absolute; white-space: nowrap; margin-top: 476px; margin-left: 658px;
+                               font-size: 14px;"/>
             </div>
         </t>
     </template>
