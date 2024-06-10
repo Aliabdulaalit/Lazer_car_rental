@@ -190,7 +190,7 @@ class RentalDeposit(models.Model):
 
     payment_method_line_type = fields.Selection(related='payment_method_line_id.type')
     cheque_date = fields.Date()
-    cheque_number = fields.Date(string='Cheque No.')
+    cheque_number = fields.Char(string='Cheque No.')
     cheque_bank_id = fields.Many2one('res.bank')
 
 
