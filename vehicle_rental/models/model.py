@@ -188,6 +188,17 @@ class RentalDeposit(models.Model):
     rent_to = fields.Datetime()
 
 
+class AccountPaymentMethodLine(models.Model):
+    _inherit = 'account.payment.method.line'
+
+    type = fields.Selection([
+        ('cash', 'Cash'),
+        ('card', 'Card'),
+        ('cheque', 'Cheque'),
+        ('bank_transfer', 'Bank Transfer')
+    ], required=True, tracking=True)
+
+
 class AccountPaymentRegister(models.TransientModel):
     _inherit = 'account.payment.register'
 
