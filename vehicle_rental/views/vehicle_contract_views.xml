@@ -79,7 +79,7 @@
                         </group>
                         <group string="Pick-Up &amp; Drop-Off Details">
                             <group>
-                                <field name="start_date" required="1" readonly="status != 'a_draft'"/>
+                                <field name="start_date" readonly="status != 'a_draft'"/>
                                 <span class="o_form_label o_td_label" name="address_name">
                                     <strong>Pick-Up Location</strong>
                                 </span>
@@ -125,8 +125,7 @@
                         </group>
                         <group string="Vehicle Details">
                             <group>
-                                <field name="vehicle_id" required="1"
-                                       readonly="not start_date or status != 'a_draft'"
+                                <field name="vehicle_id" required="1" readonly="status != 'a_draft'"
                                        domain="[('status', '=', 'available')]"/>
                                 <field name="compute_start_date" invisible="0"/>
                                 <field name="is_equal_date" invisible="0"/>

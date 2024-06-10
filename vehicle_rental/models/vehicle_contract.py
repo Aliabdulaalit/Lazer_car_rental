@@ -455,7 +455,7 @@ contract_id.write({{'activity_ids': [(0, 0, {{
     @api.constrains('start_date', 'end_date')
     def _contract_check_dates(self):
         for record in self:
-            if record.start_date > record.end_date:
+            if record.start_date and record.end_date and record.start_date > record.end_date:
                 raise ValidationError(_("Please ensure that the Drop-off Date is greater than the Pick-up Date"))
 
     @api.depends('total_vehicle_rent', 'rent_type', 'rent', 'total_days', 'driver_charge', 'total_km',
