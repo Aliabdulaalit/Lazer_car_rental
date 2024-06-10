@@ -216,11 +216,14 @@
                                 <field name="invoice_item_id" readonly="installment_created != False"/>
                             </group>
                             <group>
-                                <field name="if_any_deposit" readonly="account_payment_id != False"/>
-                                <field name="journal_id" required="if_any_deposit == True"
-                                       invisible="if_any_deposit == False" readonly="account_payment_id != False"/>
-                                <field name="deposit" invisible="if_any_deposit == False"
-                                       readonly="account_payment_id != False"/>
+                                <field name="if_any_deposit" readonly="account_payment_id"/>
+                                <field name="journal_id" required="if_any_deposit" invisible="not if_any_deposit"
+                                       readonly="account_payment_id"/>
+                                <field name="available_payment_method_line_ids" invisible="1"/>
+                                <field name="payment_method_line_id" required="if_any_deposit"
+                                       invisible="not if_any_deposit" readonly="account_payment_id"
+                                       options="{'no_create': True, 'no_open': True}"/>
+                                <field name="deposit" invisible="not if_any_deposit" readonly="account_payment_id"/>
                                 <field name="account_payment_id" invisible="1"/>
                                 <field name="currency_id" invisible="1"/>
                                 <field name="company_id" invisible="1"/>

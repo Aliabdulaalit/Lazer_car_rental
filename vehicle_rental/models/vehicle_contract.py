@@ -174,6 +174,12 @@ class VehicleContract(models.Model):
     account_payment_state = fields.Selection(related='account_payment_id.state', string="Account Payment State")
     journal_id = fields.Many2one('account.journal', domain=[('type', 'in', ('bank', 'cash'))],
                                  string="Deposit Journal")
+    payment_method_line_id = fields.Many2one('account.payment.method.line', string='Payment Method',
+                                             readonly=False, store=True, copy=False,
+                                             compute='_compute_payment_method_line_id',
+                                             domain="[('id', 'in', available_payment_method_line_ids)]")
+    available_payment_method_line_ids = fields.Many2many('account.payment.method.line',
+                                                         compute='_compute_payment_method_line_fields')
     date = fields.Date(string="Date")
     signature = fields.Binary(string="Signature")
 
@@ -203,6 +209,23 @@ class VehicleContract(models.Model):
                 rec.compute_start_date = rec.start_date.date()
             else:
                 rec.compute_start_date = False
+
+    @api.depends('available_payment_method_line_ids')
+    def _compute_payment_method_line_id(self):
+        for pay in self:
+            available_payment_method_lines = pay.available_payment_method_line_ids
+
+            if pay.payment_method_line_id in available_payment_method_lines:
+                pay.payment_method_line_id = pay.payment_method_line_id
+            elif available_payment_method_lines:
+                pay.payment_method_line_id = available_payment_method_lines[0]._origin
+            else:
+                pay.payment_method_line_id = False
+
+    @api.depends('journal_id', 'currency_id')
+    def _compute_payment_method_line_fields(self):
+        for rec in self:
+            rec.available_payment_method_line_ids = rec.journal_id._get_available_payment_method_lines('inbound')
 
     @api.depends('start_date')
     def compute_is_equal_date(self):
@@ -325,6 +348,7 @@ contract_id.write({{'activity_ids': [(0, 0, {{
                     'payment_type': 'inbound',
                     'amount': self.deposit,
                     'journal_id': self.journal_id.id,
+                    'payment_method_line_id': self.payment_method_line_id.id,
                     'vehicle_contract_id': self.id,
                     'vehicle_contract_invoice_type': 'deposit'
                 }
