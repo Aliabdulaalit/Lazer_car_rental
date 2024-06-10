@@ -184,8 +184,14 @@ class RentalDeposit(models.Model):
         ('damage', 'Damage'),
         ('cancellation', 'Cancellation')
     ], default=None)
+
     rent_from = fields.Datetime()
     rent_to = fields.Datetime()
+
+    payment_method_line_type = fields.Selection(related='payment_method_line_id.type')
+    cheque_date = fields.Date()
+    cheque_number = fields.Date(string='Cheque No.')
+    cheque_bank_id = fields.Many2one('res.bank')
 
 
 class AccountPaymentMethodLine(models.Model):

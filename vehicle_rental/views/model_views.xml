@@ -32,6 +32,20 @@
                             <field name="rent_to"/>
                         </group>
                     </group>
+
+                    <group col="3" name="cheque_info" invisible="payment_method_line_type != 'cheque'">
+                        <field name="payment_method_line_type" invisible="True"/>
+                        <group>
+                            <field name="cheque_date" required="payment_method_line_type == 'cheque'"/>
+                        </group>
+                        <group>
+                            <field name="cheque_number" required="payment_method_line_type == 'cheque'"/>
+                        </group>
+                        <group>
+                            <field name="cheque_bank_id" required="payment_method_line_type == 'cheque'"
+                                   options="{'no_quick_create': True}"/>
+                        </group>
+                    </group>
                 </xpath>
             </field>
         </record>
