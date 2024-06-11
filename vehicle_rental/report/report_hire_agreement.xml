@@ -66,6 +66,9 @@
                 <strong t-field="o.customer_id"
                         style="position: absolute; white-space: nowrap; margin-top: 237px; margin-left: 90px;
                                font-size: 12px;"/>
+                <strong t-field="o.start_date"
+                        style="position: absolute; white-space: nowrap; margin-top: 237px; margin-left: 537px;
+                               font-size: 12px;"/>
                 <strong t-field="o.work_name"
                         style="position: absolute; white-space: nowrap; margin-top: 265px; margin-left: 122px;
                                font-size: 12px;"/>
@@ -101,34 +104,34 @@
                                font-size: 12px;"/>
 
                 <t t-if="o.rent_type == 'hour'">
-                    <strong t-esc="int(o.rent)"
+                    <strong t-esc="int(o.amount_untaxed)"
                             style="position: absolute; white-space: nowrap; margin-top: 386px; margin-left: 583px;
                                    font-size: 14px;"/>
-                    <strong t-esc="'{:,.3f}'.format(o.rent).split('.')[1]"
+                    <strong t-esc="'{:,.3f}'.format(o.amount_untaxed).split('.')[1]"
                             style="position: absolute; white-space: nowrap; margin-top: 386px; margin-left: 664px;
                                    font-size: 14px;"/>
                 </t>
                 <t t-elif="o.rent_type == 'days'">
-                    <strong t-esc="int(o.rent)"
+                    <strong t-esc="int(o.amount_untaxed)"
                             style="position: absolute; white-space: nowrap; margin-top: 417px; margin-left: 583px;
                                    font-size: 14px;"/>
-                    <strong t-esc="'{:,.3f}'.format(o.rent).split('.')[1]"
+                    <strong t-esc="'{:,.3f}'.format(o.amount_untaxed).split('.')[1]"
                             style="position: absolute; white-space: nowrap; margin-top: 417px; margin-left: 664px;
                                    font-size: 14px;"/>
                 </t>
                 <t t-elif="o.rent_type == 'week'">
-                    <strong t-esc="int(o.rent)"
+                    <strong t-esc="int(o.amount_untaxed)"
                             style="position: absolute; white-space: nowrap; margin-top: 449px; margin-left: 583px;
                                    font-size: 14px;"/>
-                    <strong t-esc="'{:,.3f}'.format(o.rent).split('.')[1]"
+                    <strong t-esc="'{:,.3f}'.format(o.amount_untaxed).split('.')[1]"
                             style="position: absolute; white-space: nowrap; margin-top: 449px; margin-left: 664px;
                                    font-size: 14px;"/>
                 </t>
                 <t t-elif="o.rent_type == 'month'">
-                    <strong t-esc="int(o.rent)"
+                    <strong t-esc="int(o.amount_untaxed)"
                             style="position: absolute; white-space: nowrap; margin-top: 480px; margin-left: 583px;
                                    font-size: 14px;"/>
-                    <strong t-esc="'{:,.3f}'.format(o.rent).split('.')[1]"
+                    <strong t-esc="'{:,.3f}'.format(o.amount_untaxed).split('.')[1]"
                             style="position: absolute; white-space: nowrap; margin-top: 480px; margin-left: 664px;
                                    font-size: 14px;"/>
                 </t>
@@ -140,10 +143,10 @@
                         style="position: absolute; white-space: nowrap; margin-top: 543px; margin-left: 664px;
                                font-size: 14px;"/>
 
-                <strong t-esc="int(o.total_vehicle_rent)"
+                <strong t-esc="int(o.amount_untaxed + o.amount_tax)"
                         style="position: absolute; white-space: nowrap; margin-top: 574px; margin-left: 583px;
                                font-size: 14px;"/>
-                <strong t-esc="'{:,.3f}'.format(o.total_vehicle_rent).split('.')[1]"
+                <strong t-esc="'{:,.3f}'.format(o.amount_untaxed + o.amount_tax).split('.')[1]"
                         style="position: absolute; white-space: nowrap; margin-top: 574px; margin-left: 664px;
                                font-size: 14px;"/>
 
