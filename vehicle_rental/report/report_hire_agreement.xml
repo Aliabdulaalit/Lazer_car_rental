@@ -159,6 +159,18 @@
                 <strong t-field="o.related_card_holder_name"
                         style="position: absolute; white-space: nowrap; margin-top: 663px; margin-left: 365px;
                                font-size: 12px;"/>
+
+                <strong t-esc="'{:,.2f}'.format(o.last_odometer)"
+                        style="position: absolute; white-space: nowrap; margin-top: 778px; margin-left: 374px;
+                               font-size: 12px;"/>
+                <t t-if="o.status != 'a_draft'">
+                    <strong t-esc="'{:,.2f}'.format(o.after_receiving_odometer)"
+                            style="position: absolute; white-space: nowrap; margin-top: 778px; margin-left: 490px;
+                                   font-size: 12px;"/>
+                    <strong t-esc="'{:,.2f}'.format(o.after_receiving_odometer - o.last_odometer)"
+                            style="position: absolute; white-space: nowrap; margin-top: 778px; margin-left: 641px;
+                                   font-size: 12px;"/>
+                </t>
             </div>
         </t>
     </template>
