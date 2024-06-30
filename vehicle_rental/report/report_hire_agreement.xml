@@ -143,10 +143,10 @@
                         style="position: absolute; white-space: nowrap; margin-top: 543px; margin-left: 664px;
                                font-size: 14px;"/>
 
-                <strong t-esc="int(o.amount_untaxed + o.amount_tax)"
+                <strong t-esc="int(o.total_amount_taxed)"
                         style="position: absolute; white-space: nowrap; margin-top: 574px; margin-left: 583px;
                                font-size: 14px;"/>
-                <strong t-esc="'{:,.3f}'.format(o.amount_untaxed + o.amount_tax).split('.')[1]"
+                <strong t-esc="'{:,.3f}'.format(o.total_amount_taxed).split('.')[1]"
                         style="position: absolute; white-space: nowrap; margin-top: 574px; margin-left: 664px;
                                font-size: 14px;"/>
 

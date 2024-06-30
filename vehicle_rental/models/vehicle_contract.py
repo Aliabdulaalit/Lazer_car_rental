@@ -163,6 +163,7 @@ class VehicleContract(models.Model):
     tax_ids = fields.Many2many('account.tax', string='Rent Taxes', domain=[('type_tax_use', '=', 'sale')])
     amount_untaxed = fields.Float(string='Rent Untaxed', compute='_compute_amount', store=True, precompute=True)
     amount_tax = fields.Float(string='Total Rent Tax', compute='_compute_amount', store=True, precompute=True)
+    total_amount_taxed = fields.Float(string='Total Rent Taxed', compute='_compute_amount', store=True, precompute=True)
     fuel_tax_ids = fields.Many2many('account.tax', 'contract_fuel_tax', 'contract_id', 'fuel_tax_id',
                                     string='Extra Fuel Taxes', domain=[('type_tax_use', '=', 'sale')])
     invoice_id = fields.Many2one('account.move')
@@ -243,7 +244,8 @@ class VehicleContract(models.Model):
                     quantity=1,
                 )
             ])['totals'].values())[0]['amount_untaxed']
-            rec.amount_tax = list(self.env['account.tax']._compute_taxes([
+
+            totals = list(self.env['account.tax']._compute_taxes([
                 self.env['account.tax']._convert_to_tax_base_line_dict(
                     rec,
                     partner=rec.customer_id,
@@ -253,7 +255,9 @@ class VehicleContract(models.Model):
                     price_unit=rec.total_vehicle_rent,
                     quantity=1,
                 )
-            ])['totals'].values())[0]['amount_tax']
+            ])['totals'].values())[0]
+            rec.amount_tax = totals['amount_tax']
+            rec.total_amount_taxed = totals['amount_untaxed'] + totals['amount_tax']
 
     @api.depends('start_date')
     def compute_is_equal_date(self):
