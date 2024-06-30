@@ -63,6 +63,14 @@
                          style="width: 96%"/>
                 </div>
 
+                <strong t-field="o.reference_no"
+                        style="position: absolute; white-space: nowrap; margin-top: 139px; margin-left: 65px;
+                               font-size: 14px;"/>
+
+                <strong t-esc="'{:,.2f}'.format(o.vehicle_id.next_service)"
+                        style="position: absolute; white-space: nowrap; margin-top: 179px; margin-left: 165px;
+                               font-size: 14px;"/>
+
                 <strong t-field="o.customer_id"
                         style="position: absolute; white-space: nowrap; margin-top: 237px; margin-left: 90px;
                                font-size: 12px;"/>
@@ -99,6 +107,7 @@
                 <strong t-field="o.end_date"
                         style="position: absolute; white-space: nowrap; margin-top: 511px; margin-left: 136px;
                                font-size: 12px;"/>
+
                 <strong t-if="o.if_any_deposit" t-esc="'{:,.3f}'.format(o.deposit)"
                         style="position: absolute; white-space: nowrap; margin-top: 620px; margin-left: 179px;
                                font-size: 12px;"/>

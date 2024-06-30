@@ -11,6 +11,8 @@ class FleetVehicle(models.Model):
     _inherit = 'fleet.vehicle'
     _description = __doc__
 
+    next_service = fields.Float(string='Next Service KM')
+
     rent_day = fields.Monetary(string="Rent / Day")
     rent_week = fields.Monetary(string="Rent / Week")
     rent_month = fields.Monetary(string="Rent / Month")

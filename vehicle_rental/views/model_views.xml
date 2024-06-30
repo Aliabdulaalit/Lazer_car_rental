@@ -72,6 +72,9 @@
                 <xpath expr="//field[@name='state_id']" position="attributes">
                     <attribute name="invisible">True</attribute>
                 </xpath>
+                <xpath expr="//field[@name='manager_id']" position="before">
+                    <field name="next_service"/>
+                </xpath>
                 <xpath expr="//form//sheet" position="before">
                     <header>
                         <field name="status" widget="statusbar"/>
