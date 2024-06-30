@@ -186,9 +186,10 @@ class VehicleContract(models.Model):
     date = fields.Date(string="Date")
     signature = fields.Binary(string="Signature")
 
-    payment_type = fields.Selection(
-        [('daily', "Daily"), ('weekly', "Weekly"), ('monthly', "Monthly"), ('quarterly', "Quarterly"),
-         ('yearly', "Yearly"), ('full_payment', "Full Payment")], string="Payment Type")
+    payment_type = fields.Selection([
+        ('daily', "Daily"), ('weekly', "Weekly"), ('monthly', "Monthly"), ('quarterly', "Quarterly"),
+        ('yearly', "Yearly"), ('full_payment', "Full Payment")
+    ], default='full_payment', readonly=True, string="Payment Type")
     vehicle_payment_option_ids = fields.One2many('vehicle.payment.option', 'vehicle_contract_id')
     invoice_item_id = fields.Many2one('product.product', string="Invoice Item", required=True,
                                       default=lambda self: self.env.ref('vehicle_rental.vehicle_rent_charge',
@@ -705,219 +706,26 @@ contract_id.write({{'activity_ids': [(0, 0, {{
             raise ValidationError(_("Fuel charges must be positive."))
 
     def action_create_vehicle_payment(self):
-        for rec in self:
-            if not rec.payment_type:
-                message = {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'type': 'warning',
-                        'message': "Select your preferred payment method to proceed.",
-                        'sticky': False,
-                    }
+        if any(not rec.payment_type for rec in self):
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'type': 'warning',
+                    'message': "Select your preferred payment method to proceed.",
+                    'sticky': False,
                 }
-                return message
-            if rec.end_date and rec.start_date:
-                days_diff = rec.end_date - rec.start_date
-                diff = relativedelta(rec.end_date, rec.start_date)
-                total_days = days_diff.days
+            }
 
-                total_months = (diff.years * 12) + diff.months
-                total_weeks = total_days // 7
-                quarter = (rec.end_date.year - rec.start_date.year) * 12 + rec.end_date.month - rec.start_date.month
-                total_quarters = quarter // 3
-
-                year_diff = relativedelta(rec.end_date, rec.start_date)
-                total_years = year_diff.years + year_diff.months / 12 + year_diff.days / 365
-
-                amount = self.total_vehicle_rent
-
-                if self.payment_type == 'full_payment':
-                    full_payment_data = {
-                        'invoice_item_id': self.invoice_item_id.id,
-                        'name': 'Full Payment Invoice',
-                        'payment_date': fields.Date.today(),
-                        'payment_amount': amount,
-                        'vehicle_contract_id': self.id,
-                    }
-                    self.env['vehicle.payment.option'].create(full_payment_data)
-                elif self.payment_type == 'daily':
-                    if total_days == 0:
-                        daily_payment_data = {
-                            'invoice_item_id': self.invoice_item_id.id,
-                            'name': 'Daily Payment Invoice',
-                            'payment_date': fields.Date.today(),
-                            'payment_amount': amount,
-                            'vehicle_contract_id': self.id,
-                        }
-                        self.env['vehicle.payment.option'].create(daily_payment_data)
-                    elif total_days > 0:
-                        day_amount = amount / total_days
-                        invoice_date = self.start_date.date()
-                        for i in range(total_days):
-                            daily_payment_data = {
-                                'invoice_item_id': self.invoice_item_id.id,
-                                'name': 'Installment ' + str(i + 1),
-                                'payment_date': invoice_date,
-                                'payment_amount': day_amount,
-                                'vehicle_contract_id': self.id,
-                            }
-                            self.env['vehicle.payment.option'].create(daily_payment_data)
-                            invoice_date = invoice_date + relativedelta(days=1)
-                elif self.payment_type == 'monthly':
-                    if total_months == 0:
-                        monthly_payment_data = {
-                            'invoice_item_id': self.invoice_item_id.id,
-                            'name': 'Monthly Payment Invoice',
-                            'payment_date': fields.Date.today(),
-                            'payment_amount': amount,
-                            'vehicle_contract_id': self.id,
-                        }
-                        self.env['vehicle.payment.option'].create(monthly_payment_data)
-                    if total_months > 0:
-                        day_amount = amount / total_days
-                        remain_amount = amount
-                        invoice_date = self.start_date.date()
-                        for i in range(total_months):
-                            current_month_days = calendar.monthrange(invoice_date.year, invoice_date.month)[1]
-                            monthly_payment_data = {
-                                'invoice_item_id': self.invoice_item_id.id,
-                                'name': 'Installment ' + str(i + 1),
-                                'payment_date': invoice_date,
-                                'payment_amount': current_month_days * day_amount,
-                                'vehicle_contract_id': self.id,
-                            }
-                            self.env['vehicle.payment.option'].create(monthly_payment_data)
-                            invoice_date = invoice_date + relativedelta(months=1)
-                            remain_amount = remain_amount - monthly_payment_data['payment_amount']
-                        if remain_amount > 0:
-                            monthly_payment_data = {
-                                'invoice_item_id': self.invoice_item_id.id,
-                                'name': 'Remain Days ',
-                                'payment_date': invoice_date,
-                                'payment_amount': remain_amount,
-                                'vehicle_contract_id': self.id,
-                            }
-                            self.env['vehicle.payment.option'].create(monthly_payment_data)
-                elif self.payment_type == 'weekly':
-                    if total_weeks == 0:
-                        weekly_payment_data = {
-                            'invoice_item_id': self.invoice_item_id.id,
-                            'name': 'Weekly Payment Invoice',
-                            'payment_date': fields.Date.today(),
-                            'payment_amount': amount,
-                            'vehicle_contract_id': self.id,
-                        }
-                        self.env['vehicle.payment.option'].create(weekly_payment_data)
-                    if total_weeks > 0:
-                        start_date = self.start_date
-                        day_amount = amount / total_days
-                        remain_amount = amount
-                        invoice_date = self.start_date.date()
-                        for i in range(total_weeks):
-                            q_end_date = start_date + relativedelta(days=7)
-                            q_days = (q_end_date - start_date).days
-                            weekly_payment_data = {
-                                'invoice_item_id': self.invoice_item_id.id,
-                                'name': 'Installment ' + str(i + 1),
-                                'payment_date': invoice_date,
-                                'payment_amount': q_days * day_amount,
-                                'vehicle_contract_id': self.id,
-                            }
-                            self.env['vehicle.payment.option'].create(weekly_payment_data)
-                            invoice_date = invoice_date + relativedelta(days=7)
-                            remain_amount = remain_amount - weekly_payment_data['payment_amount']
-                        if remain_amount > 0:
-                            weekly_payment_data = {
-                                'invoice_item_id': self.invoice_item_id.id,
-                                'name': 'Remain Days',
-                                'payment_date': invoice_date,
-                                'payment_amount': remain_amount,
-                                'vehicle_contract_id': self.id,
-                            }
-                            self.env['vehicle.payment.option'].create(weekly_payment_data)
-                elif self.payment_type == 'quarterly':
-                    if total_quarters == 0:
-                        quarterly_payment_data = {
-                            'invoice_item_id': self.invoice_item_id.id,
-                            'name': 'Quarterly Payment Invoice',
-                            'payment_date': fields.Date.today(),
-                            'payment_amount': amount,
-                            'vehicle_contract_id': self.id,
-                        }
-                        self.env['vehicle.payment.option'].create(quarterly_payment_data)
-                    if total_quarters > 0:
-                        start_date = self.start_date
-                        day_amount = amount / total_days
-                        remain_amount = amount
-                        for i in range(total_quarters):
-                            q_end_date = start_date + relativedelta(months=3)
-                            q_days = (q_end_date - start_date).days
-                            payment_data = {
-                                'invoice_item_id': self.invoice_item_id.id,
-                                'name': 'Installment ' + str(i + 1),
-                                'payment_date': start_date,
-                                'payment_amount': q_days * day_amount,
-                                'vehicle_contract_id': self.id,
-                            }
-                            self.env['vehicle.payment.option'].create(payment_data)
-                            start_date = q_end_date + relativedelta(days=1)
-                            remain_amount = remain_amount - payment_data['payment_amount']
-                        if remain_amount > 0:
-                            monthly_payment_data = {
-                                'invoice_item_id': self.invoice_item_id.id,
-                                'name': 'Remain Days ',
-                                'payment_date': start_date,
-                                'payment_amount': remain_amount,
-                                'vehicle_contract_id': self.id,
-                            }
-                            self.env['vehicle.payment.option'].create(monthly_payment_data)
-
-                elif self.payment_type == 'yearly':
-                    if total_years == 0:
-                        yearly_payment_data = {
-                            'invoice_item_id': self.invoice_item_id.id,
-                            'name': 'Yearly Payment Invoice',
-                            'payment_date': fields.Date.today(),
-                            'payment_amount': amount,
-                            'vehicle_contract_id': self.id,
-                        }
-                        self.env['vehicle.payment.option'].create(yearly_payment_data)
-                    elif total_years > 0:
-                        start_date = self.start_date
-                        day_amount = amount / total_days
-                        current_year = self.start_date.year
-                        current_year_start_date = datetime(current_year, 1, 1)
-                        current_year_end_date = datetime(current_year + 1, 1, 1)
-                        number_of_days_in_current_year = (current_year_end_date - current_year_start_date).days
-                        full_year_amount = round(number_of_days_in_current_year * day_amount, 2)
-                        remain_amount = amount
-                        for installment_number in range(int(total_years)):
-                            payment_data = {
-                                'invoice_item_id': self.invoice_item_id.id,
-                                'name': f'Installment {installment_number + 1}',
-                                'payment_date': start_date,
-                                'payment_amount': full_year_amount,
-                                'vehicle_contract_id': self.id,
-                            }
-                            self.env['vehicle.payment.option'].create(payment_data)
-                            start_date = start_date + relativedelta(years=1)
-                            remain_amount = remain_amount - payment_data['payment_amount']
-                            current_year = start_date.year
-                            current_year_start_date = datetime(current_year, 1, 1)
-                            current_year_end_date = datetime(current_year + 1, 1, 1)
-                            number_of_days_in_current_year = (current_year_end_date - current_year_start_date).days
-                            full_year_amount = number_of_days_in_current_year * day_amount
-                        if remain_amount > 0:
-                            remain_days_payment_data = {
-                                'invoice_item_id': self.invoice_item_id.id,
-                                'name': 'Remain Days',
-                                'payment_date': start_date,
-                                'payment_amount': remain_amount,
-                                'vehicle_contract_id': self.id,
-                            }
-                            self.env['vehicle.payment.option'].create(remain_days_payment_data)
-            self.installment_created = True
+        vehicle_contract_ids = self.filtered(lambda rec: rec.payment_type == 'full_payment')
+        self.env['vehicle.payment.option'].create([{
+            'invoice_item_id': rec.invoice_item_id.id,
+            'name': 'Full Payment Invoice',
+            'payment_date': fields.Date.today(),
+            'payment_amount': rec.total_vehicle_rent,
+            'vehicle_contract_id': rec.id
+        } for rec in vehicle_contract_ids])
+        vehicle_contract_ids.write({'installment_created': True})
 
     def action_create_extra_service_charge_invoice(self):
         invoice_lines = []

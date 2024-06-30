@@ -207,8 +207,7 @@
                         </group>
 
                         <group string="Payment Details">
-                            <field name="payment_type" widget="radio" options="{'horizontal': true}"
-                                   readonly="installment_created != False"/>
+                            <field name="payment_type" widget="radio" options="{'horizontal': true}"/>
                         </group>
                         <group>
                             <group>
